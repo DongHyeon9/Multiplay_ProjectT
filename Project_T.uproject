@@ -1,0 +1,22 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{B8DC8D9B-4B47-1082-F199-E6B0D5EE5DA2}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "Project_T",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		}
+	]
+}
