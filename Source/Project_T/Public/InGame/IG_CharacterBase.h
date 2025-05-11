@@ -5,7 +5,7 @@
 #include "IG_CharacterBase.generated.h"
 
 class UInputComponent;
-class UPawnMovementComponent;
+class UFloatingPawnMovement;
 class USkeletalMeshComponent;
 class USphereComponent;
 class UIG_StatComponent;
@@ -19,7 +19,7 @@ private:
 	TObjectPtr<USphereComponent> rootComp{};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIG_CharacterBase Defulat", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UPawnMovementComponent> movementComp{};
+	TObjectPtr<UFloatingPawnMovement> movementComp{};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIG_CharacterBase Defulat", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USkeletalMeshComponent> meshComp{};

@@ -1,6 +1,7 @@
 #include "InGame/Player/IGC_Player.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "InGame/Player/IG_SkillComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputComponent.h"
