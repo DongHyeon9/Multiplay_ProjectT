@@ -1,8 +1,9 @@
 #include "InGame/Player/IGC_Player.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "InGame/Player/IG_SkillComponent.h"
+#include "GameFramework/FloatingPawnMovement.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -19,9 +20,22 @@ AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	moveAction = CreateDefaultSubobject<UInputAction>(TEXT("MoveAction"));
 
 	springArmComp->SetupAttachment(RootComponent);
+	springArmComp->SetRelativeRotation(FRotator(-60.0f, 0.0f, 0.0f));
+	springArmComp->TargetArmLength = 1200.0f;
+	springArmComp->bEnableCameraLag = true;
+	springArmComp->CameraLagSpeed = 3.0f;
+
+	GetCharacterMovementComp()->MaxSpeed = 600.0f;
+
 	camera->SetupAttachment(springArmComp);
 
 	moveAction->ValueType = EInputActionValueType::Axis2D;
+
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_PLAYER(TEXT("/Game/02_Mesh/PlayerCharacter/SKM_Manny"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> ABP_PLAYER(TEXT("/Game/06_Animation/PlayerCharacter/ABP_Manny"));
+
+	if (SK_PLAYER.Succeeded()) GetSkeletalMeshComp()->SetSkeletalMesh(SK_PLAYER.Object);
+	if (ABP_PLAYER.Succeeded())	GetSkeletalMeshComp()->SetAnimClass(ABP_PLAYER.Class);
 }
 
 void AIGC_Player::SetupPlayerInputComponent(UInputComponent* _PlayerInputComponent)
@@ -68,6 +82,6 @@ void AIGC_Player::Move(const FInputActionValue& _Value)
 
 	FVector2D movementVector = _Value.Get<FVector2D>();
 	PRINTSTR(1, 1.0f, FColor::Cyan, TEXT("%s"), *movementVector.ToString());
-	AddMovementInput(GetActorForwardVector(), movementVector.Y);
-	AddMovementInput(GetActorRightVector(), movementVector.X);
+	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), movementVector.Y);
+	AddMovementInput(FVector(0.0f, 1.0f, 0.0f), movementVector.X);
 }

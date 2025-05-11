@@ -34,6 +34,7 @@ public:
 	FORCEINLINE TObjectPtr<USphereComponent> GetSphereComp()const { return rootComp; }
 	FORCEINLINE TObjectPtr<USkeletalMeshComponent> GetSkeletalMeshComp()const { return meshComp; }
 	FORCEINLINE TObjectPtr<UIG_StatComponent> GetStatComp()const { return statComp; }
+	FORCEINLINE TObjectPtr<UFloatingPawnMovement> GetCharacterMovementComp()const { return movementComp; }
 
 protected:
 	void BeginPlay() override;
