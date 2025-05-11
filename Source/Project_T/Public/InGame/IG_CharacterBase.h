@@ -1,31 +1,41 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
-#include "CoreMinimal.h"
+#include "../Project_T.h"
 #include "GameFramework/Pawn.h"
 #include "IG_CharacterBase.generated.h"
 
-UCLASS()
+class UInputComponent;
+class UPawnMovementComponent;
+class USkeletalMeshComponent;
+class USphereComponent;
+class UIG_StatComponent;
+
+UCLASS(Abstract)
 class PROJECT_T_API AIG_CharacterBase : public APawn
 {
 	GENERATED_BODY()
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIG_CharacterBase Defulat", meta = (AllowPrivateAccess = true))
+	TObjectPtr<USphereComponent> rootComp{};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIG_CharacterBase Defulat", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UPawnMovementComponent> movementComp{};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIG_CharacterBase Defulat", meta = (AllowPrivateAccess = true))
+	TObjectPtr<USkeletalMeshComponent> meshComp{};
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIG_CharacterBase Defulat", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UIG_StatComponent> statComp{};
 
 public:
-	// Sets default values for this pawn's properties
-	AIG_CharacterBase();
+	AIG_CharacterBase(const FObjectInitializer& _Intializer);
+
+public:
+	FORCEINLINE TObjectPtr<USphereComponent> GetSphereComp()const { return rootComp; }
+	FORCEINLINE TObjectPtr<USkeletalMeshComponent> GetSkeletalMeshComp()const { return meshComp; }
+	FORCEINLINE TObjectPtr<UIG_StatComponent> GetStatComp()const { return statComp; }
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	
-	
 };
