@@ -7,8 +7,8 @@ public class Project_T : ModuleRules
 	public Project_T(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineServicesOSSAdapter" , "OnlineSubsystem" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
