@@ -1,5 +1,5 @@
 #include "InGame/IG_CharacterBase.h"
-#include "GameFramework/FloatingPawnMovement.h"
+#include "InGame/IG_CharacterMovement.h"
 #include "Components/SphereComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "InGame/IG_StatComponent.h"
@@ -8,8 +8,9 @@ AIG_CharacterBase::AIG_CharacterBase(const FObjectInitializer& _Intializer):
 	Super(_Intializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicateUsingRegisteredSubObjectList = true;
 
-	movementComp = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComp"));
+	movementComp = CreateDefaultSubobject<UIG_CharacterMovement>(TEXT("MovementComp"));
 	meshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComp"));
 	rootComp = CreateDefaultSubobject<USphereComponent>(TEXT("RootComp"));
 	statComp = CreateDefaultSubobject<UIG_StatComponent>(TEXT("StatComp"));
@@ -28,5 +29,10 @@ void AIG_CharacterBase::BeginPlay()
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
 	rootComp->SetHiddenInGame(false);
 #endif
+
+	if (!HasAnyFlags(RF_ClassDefaultObject))
+	{
+		AddReplicatedSubObject(movementComp);
+	}
 
 }

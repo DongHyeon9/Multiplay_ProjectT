@@ -5,7 +5,7 @@
 #include "IG_CharacterBase.generated.h"
 
 class UInputComponent;
-class UFloatingPawnMovement;
+class UIG_CharacterMovement;
 class USkeletalMeshComponent;
 class USphereComponent;
 class UIG_StatComponent;
@@ -19,7 +19,7 @@ private:
 	TObjectPtr<USphereComponent> rootComp{};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIG_CharacterBase Defulat", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UFloatingPawnMovement> movementComp{};
+	TObjectPtr<UIG_CharacterMovement> movementComp{};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIG_CharacterBase Defulat", meta = (AllowPrivateAccess = true))
 	TObjectPtr<USkeletalMeshComponent> meshComp{};
@@ -34,9 +34,11 @@ public:
 	FORCEINLINE TObjectPtr<USphereComponent> GetSphereComp()const { return rootComp; }
 	FORCEINLINE TObjectPtr<USkeletalMeshComponent> GetSkeletalMeshComp()const { return meshComp; }
 	FORCEINLINE TObjectPtr<UIG_StatComponent> GetStatComp()const { return statComp; }
-	FORCEINLINE TObjectPtr<UFloatingPawnMovement> GetCharacterMovementComp()const { return movementComp; }
+	FORCEINLINE TObjectPtr<UIG_CharacterMovement> GetCharacterMovementComp()const { return movementComp; }
 
 protected:
 	void BeginPlay() override;
+
+private:
 
 };

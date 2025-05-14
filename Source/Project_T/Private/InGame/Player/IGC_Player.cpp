@@ -2,7 +2,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InGame/Player/IG_SkillComponent.h"
-#include "GameFramework/FloatingPawnMovement.h"
+#include "InGame/IG_CharacterMovement.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputComponent.h"
@@ -35,7 +35,7 @@ AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ABP_PLAYER(TEXT("/Game/06_Animation/PlayerCharacter/ABP_Manny"));
 
 	if (SK_PLAYER.Succeeded()) GetSkeletalMeshComp()->SetSkeletalMesh(SK_PLAYER.Object);
-	if (ABP_PLAYER.Succeeded())	GetSkeletalMeshComp()->SetAnimClass(ABP_PLAYER.Class);
+	if (ABP_PLAYER.Succeeded())	GetSkeletalMeshComp()->SetAnimInstanceClass(ABP_PLAYER.Class);
 }
 
 void AIGC_Player::SetupPlayerInputComponent(UInputComponent* _PlayerInputComponent)
@@ -44,7 +44,19 @@ void AIGC_Player::SetupPlayerInputComponent(UInputComponent* _PlayerInputCompone
 
 	if (UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(_PlayerInputComponent))
 	{
+		enhancedInputComponent->BindAction(moveAction, ETriggerEvent::Started, this, &AIGC_Player::MoveStart);
 		enhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &AIGC_Player::Move);
+		enhancedInputComponent->BindAction(moveAction, ETriggerEvent::Completed, this, &AIGC_Player::MoveEnd);
+	}
+}
+
+void AIGC_Player::Tick(float _DeltaTime)
+{
+	Super::Tick(_DeltaTime);
+
+	if (bIsMove && GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
+	{
+		Server_Move(GetActorLocation());
 	}
 }
 
@@ -76,12 +88,26 @@ void AIGC_Player::PreInitializeComponents()
 	moveBackward.Modifiers.Emplace(negate);
 }
 
+void AIGC_Player::MoveStart()
+{
+	bIsMove = true;
+}
+
 void AIGC_Player::Move(const FInputActionValue& _Value)
 {
 	if (Controller == nullptr) return;
 
 	FVector2D movementVector = _Value.Get<FVector2D>();
-	PRINTSTR(1, 1.0f, FColor::Cyan, TEXT("%s"), *movementVector.ToString());
 	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), movementVector.Y);
 	AddMovementInput(FVector(0.0f, 1.0f, 0.0f), movementVector.X);
+}
+
+void AIGC_Player::MoveEnd()
+{
+	bIsMove = false;
+}
+
+void AIGC_Player::Server_Move_Implementation(const FVector_NetQuantize100& _Transform)
+{
+	SetActorLocation(_Transform);
 }

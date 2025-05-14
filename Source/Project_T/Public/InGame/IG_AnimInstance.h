@@ -5,7 +5,7 @@
 #include "IG_AnimInstance.generated.h"
 
 class AIG_CharacterBase;
-class UFloatingPawnMovement;
+class UIG_CharacterMovement;
 
 UCLASS()
 class PROJECT_T_API UIG_AnimInstance : public UAnimInstance
@@ -17,7 +17,7 @@ private:
 	TObjectPtr<AIG_CharacterBase> character{};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "UIG_AnimInstance Default", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UFloatingPawnMovement> movementComp{};
+	TObjectPtr<UIG_CharacterMovement> movementComp{};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "UIG_AnimInstance Default", meta = (AllowPrivateAccess = true))
 	FVector velocity{};

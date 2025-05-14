@@ -1,6 +1,6 @@
 #include "InGame/IG_AnimInstance.h"
 #include "InGame/IG_CharacterBase.h"
-#include "GameFramework/FloatingPawnMovement.h"
+#include "InGame/IG_CharacterMovement.h"
 
 void UIG_AnimInstance::NativeInitializeAnimation()
 {
@@ -19,6 +19,6 @@ void UIG_AnimInstance::NativeUpdateAnimation(float _DeltaSeconds)
 
 	if (!character) return;
 
-	velocity = movementComp->Velocity;
+	velocity = movementComp->GetVelocity();
 	speed = velocity.Length();
 }
