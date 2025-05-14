@@ -1,10 +1,10 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
-#include "../Project_T.h"
-#include "UObject/NoExportTypes.h"
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
 #include "IG_SkillBase.generated.h"
-
-class UAnimMontage;
 
 UENUM(BlueprintType)
 enum class E_SKILL_TYPE : uint8
@@ -23,39 +23,51 @@ struct FSkillInfo
 	GENERATED_USTRUCT_BODY()
 
 public:
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite)
-	FName skillName{};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	E_SKILL_TYPE Type{ E_SKILL_TYPE::LINETRACE };
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite)
-	TObjectPtr<AActor> skillActor{};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	FName Name{};
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite)
-	TObjectPtr<UAnimMontage> skillMontage{};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	uint8 level{ 0 };
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	float damage{ 10.f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	float coolTime{ 5.f };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	float duration{ 3.f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	TObjectPtr<UAnimMontage> skillMontage{};
 };
 
-UCLASS()
-class PROJECT_T_API UIG_SkillBase : public UObject
+UCLASS(Abstract, Blueprintable)
+class PROJECT_T_API AIG_SkillBase : public AActor
 {
 	GENERATED_BODY()
 public:
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill", meta = (AllowPrivateAccess = true), Replicated)
+	FSkillInfo SkillInfo;
 protected:
 
 private:
-	UPROPERTY(EditAnywhere,Replicated,Category = "SkillInfo")
-	TArray<FSkillInfo> skillInfos;
 
-public:
-	UFUNCTION()
-	void UseSkill();
-	UFUNCTION(BlueprintCallable,Category="Skill")
-	void UseSkill_Implementation();
+
+	UPROPERTY()
+	AActor* OwnerActor;
+public:	
+	AIG_SkillBase();
+	UFUNCTION(BlueprintCallable, Category = "Skill")
+	virtual void UseSkill(); 
+
 protected:
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const  override;
-private:
-
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	
 };

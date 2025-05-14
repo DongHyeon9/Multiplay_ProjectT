@@ -1,17 +1,33 @@
 #include "InGame/Skill/IG_SkillBase.h"
-#include <Net/UnrealNetwork.h>
+#include "Net/UnrealNetwork.h"
 
-void UIG_SkillBase::UseSkill()
+AIG_SkillBase::AIG_SkillBase()
+{
+	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
+}
+
+void AIG_SkillBase::UseSkill()
 {
 }
 
-void UIG_SkillBase::UseSkill_Implementation()
+
+
+void AIG_SkillBase::BeginPlay()
 {
+	Super::BeginPlay();
+	UE_LOG(LogTemp, Log, TEXT("Skill Used: %s"), *SkillInfo.Name.ToString());
 }
 
-void UIG_SkillBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AIG_SkillBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+void AIG_SkillBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(UIG_SkillBase, skillInfos);
+	DOREPLIFETIME(AIG_SkillBase, SkillInfo);
 }
+
