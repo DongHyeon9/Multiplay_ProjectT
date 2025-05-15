@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Intro/Widget/IL_UserWidget.h"
 #include "OnlineSubsystem.h"
@@ -30,19 +30,23 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "UILW_Main", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UILW_Modal> modalWidget{};
 
-	// Online Subsystem ¼¼¼Ç ÀÎÅÍÆäÀÌ½º
+	// Online Subsystem ì„¸ì…˜ ì¸í„°í˜ì´ìŠ¤
 	IOnlineSessionPtr sessionInterface{};
-	// ¼¼¼Ç Å½»ö ¼³Á¤
+	// ì„¸ì…˜ íƒìƒ‰ ì„¤ì •
 	TSharedPtr<FOnlineSessionSearch> sessionSearch{};
 
-	// µ¨¸®°ÔÀÌÆ® ÇÚµé
+	// ë¸ë¦¬ê²Œì´íŠ¸ í•¸ë“¤
 	FDelegateHandle findSessionsComplete{};
 
 public:
 	void NativeConstruct()override;
 
 private:
-	void CreateModal(const FText& _GuideText);
+	void CreateModal(const FText& _GuideText, const FText& _ButtonText = FText::FromString(TEXT("í™•ì¸")));
+	void RemoveModal();
+
+	UFUNCTION()
+	void OnClickedMatchCancel();
 
 	UFUNCTION()
 	void OnClickedStartMatch();

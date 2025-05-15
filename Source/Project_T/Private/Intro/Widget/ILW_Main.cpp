@@ -25,20 +25,33 @@ void UILW_Main::NativeConstruct()
 	}
 }
 
-void UILW_Main::CreateModal(const FText& _GuideText)
+void UILW_Main::CreateModal(const FText& _GuideText, const FText& _ButtonText)
 {
 	if (modalWidget && modalWidget->IsInViewport()) modalWidget->RemoveFromParent();
 
 	modalWidget = CreateWidget<UILW_Modal>(GetOwningPlayer(), modalWidgetClass);
-	modalWidget->SetText(_GuideText);
+	modalWidget->SetText(_GuideText, _ButtonText);
 	modalWidget->AddToViewport(1);
+}
+
+void UILW_Main::RemoveModal()
+{
+	modalWidget->onClicked.RemoveDynamic(this, &UILW_Main::OnClickedMatchCancel);
+	modalWidget->RemoveFromParent();
+}
+
+void UILW_Main::OnClickedMatchCancel()
+{
+	RemoveModal();
+	sessionInterface->CancelFindSessions();
+	CreateModal(LOCTEXT("Find Cancel CallBack", "서버 접속을 취소했습니다."));
 }
 
 void UILW_Main::OnClickedStartMatch()
 {
 	if (edt_Name->GetText().IsEmpty())
 	{
-		CreateModal(LOCTEXT("Session Error Text", "플레이어 이름을 작성해 주세요."));
+		CreateModal(LOCTEXT("Write Name", "플레이어 이름을 작성해 주세요."));
 		return;
 	}
 
@@ -47,6 +60,9 @@ void UILW_Main::OnClickedStartMatch()
 		CreateModal(LOCTEXT("Session Error Text", "서버에 접속할 수 없습니다.\n인터넷 연결을 확인해 주세요."));
 		return;
 	}
+
+	CreateModal(LOCTEXT("Finding Session", "서버 접속 중..."), LOCTEXT("Cancel Find Session", "취소"));
+	modalWidget->onClicked.AddDynamic(this, &UILW_Main::OnClickedMatchCancel);
 
 	// 세션 탐색 설정 생성
 	sessionSearch = MakeShared<FOnlineSessionSearch>();
@@ -65,6 +81,8 @@ void UILW_Main::OnClickedQuit()
 
 void UILW_Main::OnFindSessionsComplete(bool _bWasSuccessful)
 {
+	RemoveModal();
+
 	if (_bWasSuccessful && sessionSearch.IsValid() && sessionInterface.IsValid())
 	{
 		// 검색된 세션 중 첫 번째에 자동 접속

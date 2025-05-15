@@ -1,4 +1,4 @@
-#include "InGame/Player/IG_PlayerController.h"
+ï»¿#include "InGame/Player/IG_PlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "InputActionValue.h"
@@ -16,12 +16,15 @@ void AIG_PlayerController::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
-	//playerMappingContext ¼³Á¤ÇÏ´Â ·ÎÁ÷
+	//playerMappingContext ì„¤ì •í•˜ëŠ” ë¡œì§
 }
 
 void AIG_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetInputMode(FInputModeGameOnly{});
+	SetShowMouseCursor(false);
 
 	if (UEnhancedInputLocalPlayerSubsystem* subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
