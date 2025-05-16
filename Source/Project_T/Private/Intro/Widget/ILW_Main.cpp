@@ -5,6 +5,7 @@
 #include "OnlineSessionSettings.h"
 #include "Intro/Widget/ILW_Modal.h"
 #include "Components/EditableText.h"
+#include "GameFramework/PlayerState.h"
 
 #define LOCTEXT_NAMESPACE "UILW_Main"
 
@@ -49,7 +50,8 @@ void UILW_Main::OnClickedMatchCancel()
 
 void UILW_Main::OnClickedStartMatch()
 {
-	if (edt_Name->GetText().IsEmpty())
+	FString playerName{ edt_Name->GetText().ToString() };
+	if (playerName.IsEmpty())
 	{
 		CreateModal(LOCTEXT("Write Name", "플레이어 이름을 작성해 주세요."));
 		return;
@@ -61,6 +63,7 @@ void UILW_Main::OnClickedStartMatch()
 		return;
 	}
 
+	GetOwningPlayer()->GetPlayerState<APlayerState>()->SetPlayerName(playerName);
 	CreateModal(LOCTEXT("Finding Session", "서버 접속 중..."), LOCTEXT("Cancel Find Session", "취소"));
 	modalWidget->onClicked.AddDynamic(this, &UILW_Main::OnClickedMatchCancel);
 
