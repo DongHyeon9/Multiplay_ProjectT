@@ -3,6 +3,7 @@
 #include "Lobby/L_GameMode.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "T_GameInstance.h"
 
 void AL_PlayerController::BeginPlay()
 {
@@ -13,11 +14,13 @@ void AL_PlayerController::BeginPlay()
 		matchWaitWidget = CreateWidget<ULW_MatchWait>(this, matchWaitClass);
 		matchWaitWidget->AddToViewport();
 		matchWaitWidget->Init(maxPlayer);
+		SetInputMode(FInputModeUIOnly{});
+		SetShowMouseCursor(true);
+		Server_SetPlayerName(GetGameInstance<UT_GameInstance>()->GetUserName());
 	}
 	else if (GetLocalRole() == ENetRole::ROLE_Authority)
 	{
 		auto gm = GetWorld()->GetAuthGameMode<AL_GameMode>();
-		gm->onUpdateMatchState.AddUObject(this, &AL_PlayerController::Client_UpdateMatchState);
 		maxPlayer = gm->GetMaxPlayer();
 	}
 }
@@ -29,13 +32,16 @@ void AL_PlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME_CONDITION(AL_PlayerController, maxPlayer, COND_InitialOnly);
 }
 
-void AL_PlayerController::LoginNewPlayer()
+void AL_PlayerController::Server_SetPlayerName_Implementation(const FString& _UserName)
 {
-	if (!matchWaitWidget) return;
-	matchWaitWidget->OnStateChange();
+	GetPlayerState<APlayerState>()->SetPlayerName(_UserName);
+	if (auto gm = GetWorld()->GetAuthGameMode<AL_GameMode>())
+	{
+		gm->OnLoginComplete();
+	}
 }
 
-void AL_PlayerController::Client_UpdateMatchState_Implementation()
+bool AL_PlayerController::Server_SetPlayerName_Validate(const FString& _UserName)
 {
-	LoginNewPlayer();
+	return _UserName.StartsWith(PLAYER_NAME_PREFIX, ESearchCase::CaseSensitive);
 }

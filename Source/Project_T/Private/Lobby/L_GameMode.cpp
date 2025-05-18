@@ -4,7 +4,10 @@
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/PlayerController.h"
 
-static FName SESSION_NAME{ TEXT("ProjectTSession") };
+AL_GameMode::AL_GameMode(const FObjectInitializer& _Initializer):Super(_Initializer)
+{
+	bUseSeamlessTravel = true;
+}
 
 void AL_GameMode::BeginPlay()
 {
@@ -25,20 +28,15 @@ void AL_GameMode::BeginPlay()
 	sessions->CreateSession(0, SESSION_NAME, settings);
 }
 
-void AL_GameMode::PostLogin(APlayerController* _NewPlayer)
+void AL_GameMode::PreLogin(const FString& _Options, const FString& _Address, const FUniqueNetIdRepl& _UniqueId, FString& _ErrorMessage)
 {
-	Super::PostLogin(_NewPlayer);
+	if (GetNumPlayers() >= maxPlayer)
+	{
+		_ErrorMessage = TEXT("Server is full");
+		return;
+	}
 
-	onUpdateMatchState.Broadcast();
-
-	//플레이어가 다 차면 서버트래블
-}
-
-void AL_GameMode::Logout(AController* _Controller)
-{
-	Super::Logout(_Controller);
-
-	onUpdateMatchState.Broadcast();
+	Super::PreLogin(_Options, _Address, _UniqueId, _ErrorMessage);
 }
 
 void AL_GameMode::EndPlay(EEndPlayReason::Type _Reason)
@@ -54,6 +52,23 @@ void AL_GameMode::EndPlay(EEndPlayReason::Type _Reason)
 		sessions->DestroySession(SESSION_NAME);
 	}
 
+}
+
+void AL_GameMode::OnLoginComplete()
+{
+	if (maxPlayer == GetNumPlayers())
+	{
+		const FString mapURL = mainLevel.GetLongPackageName() + TEXT("?listen");
+
+		if (GetWorld()->ServerTravel(mapURL, true))
+		{
+			PTT_LOG(Warning, TEXT("Success Travel Level : %s"), *mapURL);
+		}
+		else
+		{
+			PTT_LOG(Warning, TEXT("Fail Travel Level : %s"), *mapURL);
+		}
+	}
 }
 
 void AL_GameMode::OnCreateSessionComplete(FName _SessionName, bool _bWasSuccessful)

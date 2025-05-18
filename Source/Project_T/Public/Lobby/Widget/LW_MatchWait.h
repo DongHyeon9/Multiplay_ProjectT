@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Lobby/Widget/L_UserWidget.h"
+#include "Containers/Ticker.h"
 #include "LW_MatchWait.generated.h"
 
 class UButton;
@@ -30,10 +31,16 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "ULW_MatchWait", meta = (AllowPrivateAccess = true))
 	float connectStateSize{ 200.0f };
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "ULW_MatchWait", meta = (AllowPrivateAccess = true))
+	float refreshInterval{ 0.1f };
+
+	FTSTicker::FDelegateHandle refreshHandle{};
+
 public:
 	void NativeConstruct()override;
+	void RemoveFromParent()override;
 	void Init(int32 _MaxPlayerCount);
-	void OnStateChange();
+	bool RefreshMatchState(float _DeltaTime);
 
 private:
 	UFUNCTION()

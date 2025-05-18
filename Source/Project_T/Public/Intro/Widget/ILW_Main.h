@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "Intro/Widget/IL_UserWidget.h"
-#include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "OnlineSubsystem.h"
 #include "ILW_Main.generated.h"
 
 class UButton;
@@ -56,4 +56,6 @@ private:
 
 	UFUNCTION()
 	void OnFindSessionsComplete(bool _bWasSuccessful);	
+
+	void OnJoinSessionComplete(FName _SessionName, EOnJoinSessionCompleteResult::Type _Result);
 };

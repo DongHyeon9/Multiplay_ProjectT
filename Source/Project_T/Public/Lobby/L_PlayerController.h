@@ -23,9 +23,9 @@ private:
 public:
 	void BeginPlay()override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	void LoginNewPlayer();
 
-	UFUNCTION(Client, Reliable)
-	void Client_UpdateMatchState();
-	void Client_UpdateMatchState_Implementation();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetPlayerName(const FString& _UserName);
+	void Server_SetPlayerName_Implementation(const FString& _UserName);
+	bool Server_SetPlayerName_Validate(const FString& _UserName);
 };

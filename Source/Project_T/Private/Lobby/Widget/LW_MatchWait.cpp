@@ -19,6 +19,13 @@ void ULW_MatchWait::NativeConstruct()
 	btn_Cancel->OnClicked.AddDynamic(this, &ULW_MatchWait::OnClickedCancel);
 }
 
+void ULW_MatchWait::RemoveFromParent()
+{
+	FTSTicker::GetCoreTicker().RemoveTicker(refreshHandle);
+
+	Super::RemoveFromParent();
+}
+
 void ULW_MatchWait::Init(int32 _MaxPlayerCount)
 {
 	connectStateList.Reserve(_MaxPlayerCount);
@@ -42,9 +49,14 @@ void ULW_MatchWait::Init(int32 _MaxPlayerCount)
 		connectState->SetState();
 		connectStateList.Emplace(connectState);
 	}
+
+	refreshHandle = FTSTicker::GetCoreTicker().AddTicker(
+		FTickerDelegate::CreateUObject(this, &ULW_MatchWait::RefreshMatchState),
+		refreshInterval
+	);
 }
 
-void ULW_MatchWait::OnStateChange()
+bool ULW_MatchWait::RefreshMatchState(float _DeltaTime)
 {
 	auto gs = GetWorld()->GetGameState<AGameState>();
 	for (int32 i = 0; i < connectStateList.Num(); ++i)
@@ -58,6 +70,8 @@ void ULW_MatchWait::OnStateChange()
 			connectStateList[i]->SetState();
 		}
 	}
+
+	return true;
 }
 
 void ULW_MatchWait::OnClickedCancel()

@@ -16,7 +16,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIL_PlayerController", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UILW_Main> mainWidget{};
-	
+
 public:
 	void BeginPlay()override;
 	

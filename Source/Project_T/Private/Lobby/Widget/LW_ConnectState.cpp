@@ -2,6 +2,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/PlayerState.h"
+#include "Kismet/KismetStringLibrary.h"
 
 #define LOCTEXT_NAMESPACE "ULW_ConnectState"
 
@@ -11,7 +12,16 @@ void ULW_ConnectState::SetState(const APlayerState* _PlayerState)
 
 	if (_PlayerState)
 	{
-		txt_PlayerName->SetText(FText::FromString(_PlayerState->GetPlayerName()));
+		FString playerName{ _PlayerState->GetPlayerName() };
+		if (playerName.Contains(PLAYER_NAME_PREFIX, ESearchCase::CaseSensitive))
+		{
+			playerName = playerName.RightChop(PLAYER_NAME_PREFIX.Len());
+		}
+		else
+		{
+			playerName = TEXT("접속중...");
+		}
+		txt_PlayerName->SetText(FText::FromString(playerName));
 		brush.TintColor = FColor::FromHex(TEXT("00FFFFB3"));
 	}
 	else
