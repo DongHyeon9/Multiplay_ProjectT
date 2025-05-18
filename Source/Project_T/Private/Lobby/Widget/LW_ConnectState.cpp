@@ -5,17 +5,14 @@
 
 #define LOCTEXT_NAMESPACE "ULW_ConnectState"
 
-void ULW_ConnectState::SetState(const APlayerController* _PlayerController)
+void ULW_ConnectState::SetState(const APlayerState* _PlayerState)
 {
 	FSlateBrush brush = img_PlayerImage->GetBrush();
 
-	if (_PlayerController)
+	if (_PlayerState)
 	{
-		if (APlayerState* ps = _PlayerController->GetPlayerState<APlayerState>())
-		{
-			txt_PlayerName->SetText(FText::FromString(ps->GetPlayerName()));
-			brush.TintColor = FColor::FromHex(TEXT("00FFFFB3"));
-		}
+		txt_PlayerName->SetText(FText::FromString(_PlayerState->GetPlayerName()));
+		brush.TintColor = FColor::FromHex(TEXT("00FFFFB3"));
 	}
 	else
 	{

@@ -6,7 +6,7 @@
 class UButton;
 class UHorizontalBox;
 class ULW_ConnectState;
-class APlayerController;
+class AL_PlayerController;
 
 UCLASS()
 class PROJECT_T_API ULW_MatchWait : public UL_UserWidget
@@ -21,7 +21,7 @@ private:
 	TObjectPtr<UHorizontalBox> hb_PlayerList{};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "ULW_MatchWait Default", meta = (AllowPrivateAccess = true))
-	TMap<APlayerController*, ULW_ConnectState*> connectStateMap{};
+	TArray<ULW_ConnectState*> connectStateList{};
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "ULW_MatchWait", meta = (AllowPrivateAccess = true))
@@ -31,8 +31,11 @@ private:
 	float connectStateSize{ 200.0f };
 
 public:
-	void Init(int32 _MaxPlayerCount, const TArray<APlayerController*>& _PrevPlayers);
-	void OnLoginPlayer(const APlayerController* _Player);
-	void OnLogoutPlayer(const APlayerController* _Player);
+	void NativeConstruct()override;
+	void Init(int32 _MaxPlayerCount);
+	void OnStateChange();
 
+private:
+	UFUNCTION()
+	void OnClickedCancel();
 };

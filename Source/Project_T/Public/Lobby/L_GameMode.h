@@ -5,28 +5,26 @@
 #include "GameFramework/GameMode.h"
 #include "L_GameMode.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnUpdateMatchStateDelegate);
+
 UCLASS()
 class PROJECT_T_API AL_GameMode : public AGameMode
 {
 	GENERATED_BODY()
 public:
-	FOnLoginPlayerDelegate onLoginPlayer{};
-	FOnLogoutPlayerDelegate onLogoutPlayer{};
+	FOnUpdateMatchStateDelegate onUpdateMatchState{};
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AL_GameMode", meta = (AllowPrivateAccess = true))
 	int32 maxPlayer{ 4 };
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AL_GameMode", meta = (AllowPrivateAccess = true))
-	TArray<APlayerController*> connectedPlayers{};
-
 public:
 	void BeginPlay()override;
-	void PostLogin(APlayerController* _NewPlayer) override;
-	void Logout(AController* _Exiting) override;
+	void PostLogin(APlayerController* _NewPlayer)override;
+	void Logout(AController* _Controller)override;
+	void EndPlay(EEndPlayReason::Type _Reason)override;
 
 public:
-	FORCEINLINE const TArray<APlayerController*>& GetCurrentPlayers()const { return connectedPlayers; }
 	FORCEINLINE int32 GetMaxPlayer()const { return maxPlayer; }
 
 private:

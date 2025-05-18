@@ -20,7 +20,6 @@ void AL_GameMode::BeginPlay()
 	settings.bIsLANMatch = true;
 	settings.bShouldAdvertise = true;
 	settings.bAllowJoinInProgress = true;
-	connectedPlayers.Reserve(maxPlayer);
 
 	sessions->OnCreateSessionCompleteDelegates.AddUObject(this, &AL_GameMode::OnCreateSessionComplete);
 	sessions->CreateSession(0, SESSION_NAME, settings);
@@ -30,22 +29,31 @@ void AL_GameMode::PostLogin(APlayerController* _NewPlayer)
 {
 	Super::PostLogin(_NewPlayer);
 
-	connectedPlayers.Emplace(_NewPlayer);
-	onLoginPlayer.Broadcast(_NewPlayer);
-	PTT_LOG(Warning, TEXT("Current Player Count : %d"), GetNumPlayers());
+	onUpdateMatchState.Broadcast();
 
-	//인원수 채워지면 시작하는 로직
+	//플레이어가 다 차면 서버트래블
 }
 
-void AL_GameMode::Logout(AController* _Exiting)
+void AL_GameMode::Logout(AController* _Controller)
 {
-	Super::Logout(_Exiting);
+	Super::Logout(_Controller);
 
-	if (APlayerController* pc = Cast<APlayerController>(_Exiting))
+	onUpdateMatchState.Broadcast();
+}
+
+void AL_GameMode::EndPlay(EEndPlayReason::Type _Reason)
+{
+	Super::EndPlay(_Reason);
+
+	if (_Reason != EEndPlayReason::LevelTransition)
 	{
-		connectedPlayers.Remove(pc);
-		onLogoutPlayer.Broadcast(pc);
+		IOnlineSubsystem* subsystem{ IOnlineSubsystem::Get() };
+		IOnlineSessionPtr sessions{ subsystem ? subsystem->GetSessionInterface() : nullptr };
+
+		check(sessions.IsValid());
+		sessions->DestroySession(SESSION_NAME);
 	}
+
 }
 
 void AL_GameMode::OnCreateSessionComplete(FName _SessionName, bool _bWasSuccessful)

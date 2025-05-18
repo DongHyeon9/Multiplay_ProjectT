@@ -18,5 +18,5 @@ private:
 	TObjectPtr<UTextBlock> txt_PlayerName{};
 
 public:
-	void SetState(const APlayerController* _PlayerController = nullptr);
+	void SetState(const APlayerState* _PlayerState = nullptr);
 };
