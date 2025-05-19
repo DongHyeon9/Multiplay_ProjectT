@@ -6,4 +6,4 @@ DEFINE_LOG_CATEGORY(PTT);
 
 const FName SESSION_NAME{ TEXT("ProjectTSession") };
 const FString PLAYER_NAME_PREFIX{ TEXT("PNPF.") };
-const int32 MAX_PLAYER_COUNT{ 3 };
+const int32 MAX_PLAYER_COUNT{ 2 };

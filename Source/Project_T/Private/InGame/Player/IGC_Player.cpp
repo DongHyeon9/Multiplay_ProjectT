@@ -20,8 +20,6 @@ AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	skillComp = CreateDefaultSubobject<UIG_SkillComponent>(TEXT("SkillComp"));
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	characterMappingContext = CreateDefaultSubobject<UInputMappingContext>(TEXT("CharacterMappingContext"));
-	moveAction = CreateDefaultSubobject<UInputAction>(TEXT("MoveAction"));
 
 	springArmComp->SetupAttachment(RootComponent);
 	springArmComp->SetRelativeRotation(FRotator(-60.0f, 0.0f, 0.0f));
@@ -39,8 +37,6 @@ AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.f, 0.0f);
 
 	camera->SetupAttachment(springArmComp);
-
-	moveAction->ValueType = EInputActionValueType::Axis2D;
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_PLAYER(TEXT("/Game/02_Mesh/PlayerCharacter/SKM_Manny"));
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ABP_PLAYER(TEXT("/Game/06_Animation/PlayerCharacter/ABP_Manny"));
@@ -83,8 +79,11 @@ void AIGC_Player::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
-	auto swizzleAxis = NewObject<UInputModifierSwizzleAxis>();
-	auto negate = NewObject<UInputModifierNegate>();
+	characterMappingContext = NewObject<UInputMappingContext>(this);
+	moveAction = NewObject<UInputAction>(this);
+	moveAction->ValueType = EInputActionValueType::Axis2D;
+	auto swizzleAxis = NewObject<UInputModifierSwizzleAxis>(this);
+	auto negate = NewObject<UInputModifierNegate>(this);
 
 	characterMappingContext->MapKey(moveAction, EKeys::D);
 	characterMappingContext->MapKey(moveAction, EKeys::A).Modifiers.Emplace(negate);
