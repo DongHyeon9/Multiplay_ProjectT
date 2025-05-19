@@ -16,6 +16,7 @@ private:
 	TArray<AIG_SkillBase*> skillList{};
 
 public:
+	UFUNCTION(BlueprintCallable, Category ="UIG_SkillComponent")
 	void RegistSkill(TSubclassOf<AIG_SkillBase> _SkillClass);
 	void EndGame();
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

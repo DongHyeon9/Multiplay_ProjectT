@@ -5,6 +5,8 @@ void AIG_SkillBase::InitSkill()
 {
 	bUseSkill = true;
 	coolDownHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_SkillBase::SkillInterval), coolDown);
+	
+	
 }
 
 bool AIG_SkillBase::SkillInterval(float _DeltaTime)

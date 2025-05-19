@@ -1,9 +1,11 @@
 ﻿#pragma once
 
-#include "CoreMinimal.h"
+#include "../Project_T.h"
 #include "GameFramework/Actor.h"
 #include "Containers/Ticker.h"
 #include "IG_SkillBase.generated.h"
+
+class UAnimMontage;
 
 UCLASS(Abstract)
 class PROJECT_T_API AIG_SkillBase : public AActor
@@ -12,7 +14,22 @@ class PROJECT_T_API AIG_SkillBase : public AActor
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_SkillBase")
-	float coolDown{};
+	TObjectPtr<UAnimMontage> animMontage{};
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_SkillBase")
+	FName skillName{};
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_SkillBase")
+	uint8 level{0};
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_SkillBase")
+	float damage{ 20.f };
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_SkillBase")
+	float duration{1.f};
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_SkillBase")
+	float coolDown{3.f};
 
 private:
 	UPROPERTY(Transient, Replicated, VisibleAnywhere, BlueprintReadOnly, category = "AIG_SkillBase", meta = (AllowPrivateAccess = true))
