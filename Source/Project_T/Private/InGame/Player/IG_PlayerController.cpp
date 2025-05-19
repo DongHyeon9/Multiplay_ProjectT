@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/WidgetComponent.h"
 #include "InGame/Widget/IGW_Main.h"
+#include "GameFramework/PlayerState.h"
 
 AIG_PlayerController::AIG_PlayerController(const FObjectInitializer& _Initializer):
 	Super(_Initializer)
@@ -33,7 +34,10 @@ void AIG_PlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 void AIG_PlayerController::Server_InitPlayer_Implementation(const FString& _NewName)
 {
+	PTT_LOG(Warning, TEXT("%s"), *GetName());
 	userName = _NewName;
+	if (auto ps = GetPlayerState<APlayerState>())
+		ps->SetPlayerName(_NewName.RightChop(PLAYER_NAME_PREFIX.Len()));
 
 	if (auto gs = GetWorld()->GetGameState<AIG_GameState>())
 		gs->OnCompletePlayer();
@@ -44,10 +48,26 @@ bool AIG_PlayerController::Server_InitPlayer_Validate(const FString& _NewName)
 	return _NewName.StartsWith(PLAYER_NAME_PREFIX, ESearchCase::CaseSensitive);
 }
 
-void AIG_PlayerController::Server_StartEventEnd_Implementation()
+void AIG_PlayerController::Server_OnFinishStartEvent_Implementation()
 {
+	PTT_LOG(Warning, TEXT("%s"), *GetName());
+
 	if (auto gs = GetWorld()->GetGameState<AIG_GameState>())
 		gs->StartGame();
+
+}
+
+void AIG_PlayerController::Server_OnFinishEndEvent_Implementation()
+{
+	PTT_LOG(Warning, TEXT("%s"), *GetName());
+
+	if (auto gs = GetWorld()->GetGameState<AIG_GameState>())
+		gs->ComputeResult();
+
+	if (mainWidget && mainWidget->IsInViewport())
+	{
+		mainWidget->StartGame();
+	}
 }
 
 void AIG_PlayerController::Client_StartGame_Implementation()
@@ -55,17 +75,35 @@ void AIG_PlayerController::Client_StartGame_Implementation()
 	EnableInput(this);
 	if (auto player = GetPawn<AIGC_Player>())
 		player->GetStatusWidget()->SetHiddenInGame(false);
+
+	if (mainWidget && mainWidget->IsInViewport())
+	{
+		mainWidget->InitTimer(GetWorld()->GetGameState<AIG_GameState>());
+	}
 }
 
 void AIG_PlayerController::Client_StartEvent_Implementation()
 {
 	if (mainWidget && mainWidget->IsInViewport())
 	{
-
+		mainWidget->InitWidget();
+		mainWidget->StartGame();
 	}
+}
+
+void AIG_PlayerController::Client_EndGame_Implementation()
+{
 	// TODO
-	// 시작 이벤트 UI
-	// 시작 이벤트 UI종료시 AIG_GameState::StartGame 호출
+	// 게임 종료시 처리해야될 로직
+	// 결과창 UI
+}
+
+void AIG_PlayerController::Client_EndEvent_Implementation()
+{
+	if (mainWidget && mainWidget->IsInViewport())
+	{
+		mainWidget->EndGame();
+	}
 }
 
 void AIG_PlayerController::BeginPlay()
@@ -85,6 +123,8 @@ void AIG_PlayerController::BeginPlay()
 
 		mainWidget = CreateWidget<UIGW_Main>(this, mainWidgetClass);
 		mainWidget->AddToViewport();
+		mainWidget->onFinishStartAnim.BindDynamic(this, &AIG_PlayerController::Server_OnFinishStartEvent);
+		mainWidget->onFinishEndAnim.BindDynamic(this, &AIG_PlayerController::Server_OnFinishEndEvent);
 	}
 }
 

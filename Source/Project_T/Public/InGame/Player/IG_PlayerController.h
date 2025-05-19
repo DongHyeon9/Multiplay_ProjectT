@@ -36,8 +36,12 @@ public:
 	bool Server_InitPlayer_Validate(const FString& _NewName);
 
 	UFUNCTION(Server, Reliable)
-	void Server_StartEventEnd();
-	void Server_StartEventEnd_Implementation();
+	void Server_OnFinishStartEvent();
+	void Server_OnFinishStartEvent_Implementation();
+
+	UFUNCTION(Server, Reliable)
+	void Server_OnFinishEndEvent();
+	void Server_OnFinishEndEvent_Implementation();
 
 	UFUNCTION(Client, Reliable)
 	void Client_StartGame();
@@ -46,6 +50,14 @@ public:
 	UFUNCTION(Client, Reliable)
 	void Client_StartEvent();
 	void Client_StartEvent_Implementation();
+
+	UFUNCTION(Client, Reliable)
+	void Client_EndGame();
+	void Client_EndGame_Implementation();
+
+	UFUNCTION(Client, Reliable)
+	void Client_EndEvent();
+	void Client_EndEvent_Implementation();
 
 protected:
 	void BeginPlay()override;

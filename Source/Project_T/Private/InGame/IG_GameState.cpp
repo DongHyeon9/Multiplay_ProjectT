@@ -6,8 +6,10 @@
 void AIG_GameState::OnCompletePlayer()
 {
 	++compeletedPlayer;
+	PTT_LOG(Warning, TEXT("compeletedPlayer : %d"), compeletedPlayer.load());
 	if (compeletedPlayer == MAX_PLAYER_COUNT)
 	{
+		compeletedPlayer = 0;
 		UWorld* world = GetWorld();
 		check(world);
 
@@ -22,15 +24,16 @@ void AIG_GameState::OnCompletePlayer()
 				pc->Client_StartEvent();
 			}
 		}
-		compeletedPlayer = 0;
 	}
 }
 
 void AIG_GameState::StartGame()
 {
 	++compeletedPlayer;
+	PTT_LOG(Warning, TEXT("compeletedPlayer : %d"), compeletedPlayer.load());
 	if (compeletedPlayer == MAX_PLAYER_COUNT)
 	{
+		compeletedPlayer = 0;
 		currentTime = gameTime;
 
 		for (auto pIter = GetWorld()->GetPlayerControllerIterator(); pIter; ++pIter)
@@ -41,22 +44,45 @@ void AIG_GameState::StartGame()
 			}
 		}
 
-		compeletedPlayer = 0;
-		gameTimerHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::GameTimer));
+		gameTimerHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::GameTimer), 1.0);
 	}
 }
 
 void AIG_GameState::EndGame()
 {
-	// TODO
-	// 게임 종료 로직
-	// 결과창 UI
+	PTT_LOG(Warning, TEXT(""));
+	for (auto pIter = GetWorld()->GetPlayerControllerIterator(); pIter; ++pIter)
+	{
+		if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
+		{
+			pc->Client_EndEvent();
+		}
+	}
+}
+
+void AIG_GameState::ComputeResult()
+{
+	++compeletedPlayer;
+	PTT_LOG(Warning, TEXT("compeletedPlayer : %d"), compeletedPlayer.load());
+	if (compeletedPlayer == MAX_PLAYER_COUNT)
+	{
+		compeletedPlayer = 0;
+
+		for (auto pIter = GetWorld()->GetPlayerControllerIterator(); pIter; ++pIter)
+		{
+			if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
+			{
+				pc->Client_EndGame();
+			}
+		}
+	}
 }
 
 bool AIG_GameState::GameTimer(float _DeltaTime)
 {
-	currentTime -= _DeltaTime;
-	bool bIsEnd{ currentTime <= 0.0f };
+	--currentTime;
+	PTT_LOG(Warning, TEXT("%.1f"), currentTime);
+	bool bIsEnd{ currentTime - KINDA_SMALL_NUMBER <= 0.0f };
 	if (bIsEnd)
 	{
 		EndGame();

@@ -12,6 +12,7 @@ AIG_CharacterBase::AIG_CharacterBase(const FObjectInitializer& _Intializer)
 	statComp = CreateDefaultSubobject<UIG_StatComponent>(TEXT("StatComp"));
 	statusWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("StatusWidget"));
 	statusWidget->SetupAttachment(RootComponent);
+	statusWidget->bOwnerNoSee;
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
 }

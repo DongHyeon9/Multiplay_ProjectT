@@ -14,7 +14,7 @@ public:
 	std::atomic<int32> compeletedPlayer{};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameState", meta = (AllowPrivateAccess = true))
-	float gameTime{ 300.0f };
+	float gameTime{ 10.0f };
 
 	UPROPERTY(Transient, Replicated, VisibleAnywhere, BlueprintReadOnly, category = "AIG_GameState", meta = (AllowPrivateAccess = true))
 	float currentTime{};
@@ -25,7 +25,10 @@ public:
 	void OnCompletePlayer();
 	void StartGame();
 	void EndGame();
-	bool GameTimer(float _DeltaTime);
+	void ComputeResult();
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	FORCEINLINE int32 GetTimer()const { return static_cast<int32>(currentTime); }
 
+private:
+	bool GameTimer(float _DeltaTime);
 };

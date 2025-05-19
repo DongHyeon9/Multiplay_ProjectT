@@ -15,7 +15,7 @@ private:
 	TObjectPtr<UTextBlock> txt_UserName{};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "UIGW_CharacterStatus", meta = (BindWidget, AllowPrivateAccess = true))
-	TObjectPtr<UProgressBar> txt_CharacterHP{};
+	TObjectPtr<UProgressBar> pb_CharacterHP{};
 
 public:
 	void NativeConstruct()override;
