@@ -13,23 +13,10 @@ void AL_PlayerController::BeginPlay()
 	{
 		matchWaitWidget = CreateWidget<ULW_MatchWait>(this, matchWaitClass);
 		matchWaitWidget->AddToViewport();
-		matchWaitWidget->Init(maxPlayer);
 		SetInputMode(FInputModeUIOnly{});
 		SetShowMouseCursor(true);
 		Server_SetPlayerName(GetGameInstance<UT_GameInstance>()->GetUserName());
 	}
-	else if (GetLocalRole() == ENetRole::ROLE_Authority)
-	{
-		auto gm = GetWorld()->GetAuthGameMode<AL_GameMode>();
-		maxPlayer = gm->GetMaxPlayer();
-	}
-}
-
-void AL_PlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(AL_PlayerController, maxPlayer, COND_InitialOnly);
 }
 
 void AL_PlayerController::Server_SetPlayerName_Implementation(const FString& _UserName)

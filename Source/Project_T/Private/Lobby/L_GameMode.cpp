@@ -30,7 +30,7 @@ void AL_GameMode::BeginPlay()
 
 void AL_GameMode::PreLogin(const FString& _Options, const FString& _Address, const FUniqueNetIdRepl& _UniqueId, FString& _ErrorMessage)
 {
-	if (GetNumPlayers() >= maxPlayer)
+	if (GetNumPlayers() >= MAX_PLAYER_COUNT)
 	{
 		_ErrorMessage = TEXT("Server is full");
 		return;
@@ -56,7 +56,7 @@ void AL_GameMode::EndPlay(EEndPlayReason::Type _Reason)
 
 void AL_GameMode::OnLoginComplete()
 {
-	if (maxPlayer == GetNumPlayers())
+	if (MAX_PLAYER_COUNT == GetNumPlayers())
 	{
 		const FString mapURL = mainLevel.GetLongPackageName() + TEXT("?listen");
 

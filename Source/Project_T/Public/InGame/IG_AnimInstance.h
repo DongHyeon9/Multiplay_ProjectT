@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include "../Project_T.h"
 #include "Animation/AnimInstance.h"
 #include "IG_AnimInstance.generated.h"
 
 class AIG_CharacterBase;
-class UIG_CharacterMovement;
+class UCharacterMovementComponent;
 
 UCLASS()
 class PROJECT_T_API UIG_AnimInstance : public UAnimInstance
@@ -17,7 +17,7 @@ private:
 	TObjectPtr<AIG_CharacterBase> character{};
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "UIG_AnimInstance Default", meta = (AllowPrivateAccess = true))
-	TObjectPtr<UIG_CharacterMovement> movementComp{};
+	TObjectPtr<UCharacterMovementComponent> movementComp{};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "UIG_AnimInstance Default", meta = (AllowPrivateAccess = true))
 	FVector velocity{};

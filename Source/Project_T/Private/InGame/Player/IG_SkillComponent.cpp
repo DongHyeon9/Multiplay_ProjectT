@@ -1,44 +1,28 @@
-#include "InGame/Player/IG_SkillComponent.h"
+﻿#include "InGame/Player/IG_SkillComponent.h"
 #include "InGame/Skill/IG_SkillBase.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/World.h"
 
-UIG_SkillComponent::UIG_SkillComponent()
+void UIG_SkillComponent::RegistSkill(TSubclassOf<AIG_SkillBase> _SkillClass)
 {
-	PrimaryComponentTick.bCanEverTick = true;
-	SetIsReplicatedByDefault(true);
+	FActorSpawnParameters param{};
+	param.Owner = GetOwner();
+	auto newSkill = GetWorld()->SpawnActor<AIG_SkillBase>(_SkillClass, param);
+	newSkill->InitSkill();
+	skillList.Emplace(newSkill);
 }
 
-void UIG_SkillComponent::UseSkill(E_SKILL_TYPE SkillType)
+void UIG_SkillComponent::EndGame()
 {
-	for (AIG_SkillBase* Skill : SkillInstances)
+	for (auto skill : skillList)
 	{
-		if (Skill && Skill->GetLocalRole() == ROLE_Authority && Skill->SkillInfo.Type == SkillType)
-		{
-			Skill->UseSkill();
-		}
+		skill->SetSkillUse(false);
 	}
 }
 
 void UIG_SkillComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(UIG_SkillComponent, SkillInstances);
+
+	DOREPLIFETIME(UIG_SkillComponent, skillList);
 }
-
-void UIG_SkillComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (GetOwnerRole() == ROLE_Authority)
-	{
-
-	}
-}
-
-void UIG_SkillComponent::TickComponent(float _DeltaTime, ELevelTick _TickType, FActorComponentTickFunction* _ThisTickFunction)
-{
-	Super::TickComponent(_DeltaTime, _TickType, _ThisTickFunction);
-
-}
-

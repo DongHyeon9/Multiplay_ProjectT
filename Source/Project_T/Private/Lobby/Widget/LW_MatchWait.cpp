@@ -17,21 +17,10 @@ void ULW_MatchWait::NativeConstruct()
 	Super::NativeConstruct();
 
 	btn_Cancel->OnClicked.AddDynamic(this, &ULW_MatchWait::OnClickedCancel);
-}
-
-void ULW_MatchWait::RemoveFromParent()
-{
-	FTSTicker::GetCoreTicker().RemoveTicker(refreshHandle);
-
-	Super::RemoveFromParent();
-}
-
-void ULW_MatchWait::Init(int32 _MaxPlayerCount)
-{
-	connectStateList.Reserve(_MaxPlayerCount);
+	connectStateList.Reserve(MAX_PLAYER_COUNT);
 	APlayerController* owner{ GetOwningPlayer() };
 
-	for (int32 i = 0; i < _MaxPlayerCount; ++i)
+	for (int32 i = 0; i < MAX_PLAYER_COUNT; ++i)
 	{
 		USizeBox* sizeBox{ WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass()) };
 		sizeBox->SetWidthOverride(connectStateSize);
@@ -54,6 +43,13 @@ void ULW_MatchWait::Init(int32 _MaxPlayerCount)
 		FTickerDelegate::CreateUObject(this, &ULW_MatchWait::RefreshMatchState),
 		refreshInterval
 	);
+}
+
+void ULW_MatchWait::RemoveFromParent()
+{
+	FTSTicker::GetCoreTicker().RemoveTicker(refreshHandle);
+
+	Super::RemoveFromParent();
 }
 
 bool ULW_MatchWait::RefreshMatchState(float _DeltaTime)

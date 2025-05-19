@@ -1,20 +1,14 @@
-#include "InGame/IG_StatComponent.h"
+﻿#include "InGame/IG_StatComponent.h"
+#include "Net/UnrealNetwork.h"
 
-UIG_StatComponent::UIG_StatComponent()
+void UIG_StatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	PrimaryComponentTick.bCanEverTick = true;
-
-}
-
-void UIG_StatComponent::BeginPlay()
-{
-	Super::BeginPlay();
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
+	DOREPLIFETIME(UIG_StatComponent, characterState);
 }
 
-void UIG_StatComponent::TickComponent(float _DeltaTime, ELevelTick _TickType, FActorComponentTickFunction* _ThisTickFunction)
+void UIG_StatComponent::OnRep_StateChange()
 {
-	Super::TickComponent(_DeltaTime, _TickType, _ThisTickFunction);
-
+	onChangeState.Broadcast(characterState);
 }
-

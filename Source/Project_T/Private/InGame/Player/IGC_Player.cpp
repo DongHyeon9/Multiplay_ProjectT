@@ -1,14 +1,18 @@
-#include "InGame/Player/IGC_Player.h"
+﻿#include "InGame/Player/IGC_Player.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "InGame/Player/IG_SkillComponent.h"
-#include "InGame/IG_CharacterMovement.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
+#include "T_GameInstance.h"
+#include "Components/WidgetComponent.h"
+#include "InGame/Widget/IGW_CharacterStatus.h"
+#include "InGame/Player/IG_PlayerController.h"
 
 AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	Super(_Intializer)
@@ -24,8 +28,15 @@ AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	springArmComp->TargetArmLength = 1200.0f;
 	springArmComp->bEnableCameraLag = true;
 	springArmComp->CameraLagSpeed = 3.0f;
+	springArmComp->bUsePawnControlRotation = true;
+	springArmComp->bInheritRoll = true;
+	springArmComp->bInheritYaw = true;
+	springArmComp->bDoCollisionTest = false;
+	bUseControllerRotationYaw = false;
 
-	GetCharacterMovementComp()->MaxSpeed = 600.0f;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.f, 0.0f);
 
 	camera->SetupAttachment(springArmComp);
 
@@ -34,8 +45,8 @@ AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_PLAYER(TEXT("/Game/02_Mesh/PlayerCharacter/SKM_Manny"));
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ABP_PLAYER(TEXT("/Game/06_Animation/PlayerCharacter/ABP_Manny"));
 
-	if (SK_PLAYER.Succeeded()) GetSkeletalMeshComp()->SetSkeletalMesh(SK_PLAYER.Object);
-	if (ABP_PLAYER.Succeeded())	GetSkeletalMeshComp()->SetAnimInstanceClass(ABP_PLAYER.Class);
+	if (SK_PLAYER.Succeeded()) GetMesh()->SetSkeletalMesh(SK_PLAYER.Object);
+	if (ABP_PLAYER.Succeeded())	GetMesh()->SetAnimInstanceClass(ABP_PLAYER.Class);
 }
 
 void AIGC_Player::SetupPlayerInputComponent(UInputComponent* _PlayerInputComponent)
@@ -44,19 +55,7 @@ void AIGC_Player::SetupPlayerInputComponent(UInputComponent* _PlayerInputCompone
 
 	if (UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(_PlayerInputComponent))
 	{
-		enhancedInputComponent->BindAction(moveAction, ETriggerEvent::Started, this, &AIGC_Player::MoveStart);
 		enhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &AIGC_Player::Move);
-		enhancedInputComponent->BindAction(moveAction, ETriggerEvent::Completed, this, &AIGC_Player::MoveEnd);
-	}
-}
-
-void AIGC_Player::Tick(float _DeltaTime)
-{
-	Super::Tick(_DeltaTime);
-
-	if (bIsMove && GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
-	{
-		Server_Move(GetActorLocation());
 	}
 }
 
@@ -64,13 +63,20 @@ void AIGC_Player::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (APlayerController* playerController = Cast<APlayerController>(Controller))
+	GetStatusWidget()->SetHiddenInGame(true);
+
+	if (GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerController->GetLocalPlayer()))
-		{
-			subsystem->AddMappingContext(characterMappingContext, 0);
-		}
+		if (APlayerController* playerController = Cast<APlayerController>(Controller))
+			if (UEnhancedInputLocalPlayerSubsystem* subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerController->GetLocalPlayer()))
+				subsystem->AddMappingContext(characterMappingContext, 0);
+
+		FString userName{ GetGameInstance<UT_GameInstance>()->GetUserName() };
+
+		if (auto pc = Cast<AIG_PlayerController>(GetController()))
+			pc->Server_InitPlayer(userName);
 	}
+
 }
 
 void AIGC_Player::PreInitializeComponents()
@@ -88,9 +94,11 @@ void AIGC_Player::PreInitializeComponents()
 	moveBackward.Modifiers.Emplace(negate);
 }
 
-void AIGC_Player::MoveStart()
+void AIGC_Player::SetUserName(const FString& _NewName)
 {
-	bIsMove = true;
+	FString userName{ _NewName.RightChop(PLAYER_NAME_PREFIX.Len()) };
+	if (auto widget = Cast<UIGW_CharacterStatus>(GetStatusWidget()->GetWidget()))
+		widget->SetName(FText::FromString(userName));
 }
 
 void AIGC_Player::Move(const FInputActionValue& _Value)
@@ -100,14 +108,4 @@ void AIGC_Player::Move(const FInputActionValue& _Value)
 	FVector2D movementVector = _Value.Get<FVector2D>();
 	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), movementVector.Y);
 	AddMovementInput(FVector(0.0f, 1.0f, 0.0f), movementVector.X);
-}
-
-void AIGC_Player::MoveEnd()
-{
-	bIsMove = false;
-}
-
-void AIGC_Player::Server_Move_Implementation(const FVector_NetQuantize100& _Transform)
-{
-	SetActorLocation(_Transform);
 }

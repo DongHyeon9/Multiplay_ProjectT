@@ -1,6 +1,6 @@
-#include "InGame/IG_AnimInstance.h"
+﻿#include "InGame/IG_AnimInstance.h"
 #include "InGame/IG_CharacterBase.h"
-#include "InGame/IG_CharacterMovement.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 void UIG_AnimInstance::NativeInitializeAnimation()
 {
@@ -10,7 +10,7 @@ void UIG_AnimInstance::NativeInitializeAnimation()
 
 	if (!character) return;
 
-	movementComp = character->GetCharacterMovementComp();
+	movementComp = character->GetCharacterMovement();
 }
 
 void UIG_AnimInstance::NativeUpdateAnimation(float _DeltaSeconds)
@@ -19,6 +19,6 @@ void UIG_AnimInstance::NativeUpdateAnimation(float _DeltaSeconds)
 
 	if (!character) return;
 
-	velocity = movementComp->GetVelocity();
+	velocity = movementComp->Velocity;
 	speed = velocity.Length();
 }

@@ -17,12 +17,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AL_PlayerController", meta = (AllowPrivateAccess = true))
 	TObjectPtr<ULW_MatchWait> matchWaitWidget{};
 
-	UPROPERTY(Transient, Replicated, VisibleAnywhere, BlueprintReadOnly, category = "AL_PlayerController", meta = (AllowPrivateAccess = true))
-	int32 maxPlayer{};
-
 public:
 	void BeginPlay()override;
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SetPlayerName(const FString& _UserName);

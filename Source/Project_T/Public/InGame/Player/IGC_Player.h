@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Project_T.h"
 #include "InGame/IG_CharacterBase.h"
@@ -35,13 +35,10 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIGC_Player Input", meta = (AllowPrivateAccess = true))
 	UInputAction* moveAction{};
 
-private:
-	uint8 bIsMove : 1{};
-
 public:	
 	AIGC_Player(const FObjectInitializer& _Intializer);
 	void SetupPlayerInputComponent(UInputComponent* _PlayerInputComponent) override;
-	void Tick(float _DeltaTime)override;
+	void SetUserName(const FString& _NewName);
 
 public:
 	FORCEINLINE TObjectPtr<UIG_SkillComponent> GetSkillComp()const { return skillComp; }
@@ -53,12 +50,6 @@ protected:
 	void PreInitializeComponents()override;
 
 private:
-	void MoveStart();
 	void Move(const FInputActionValue& _Value);
-	void MoveEnd();
-
-	UFUNCTION(Server, UnReliable)
-	void Server_Move(const FVector_NetQuantize100& _Transform);
-	void Server_Move_Implementation(const FVector_NetQuantize100& _Transform);
 
 };

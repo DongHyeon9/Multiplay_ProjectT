@@ -39,7 +39,6 @@ private:
 public:
 	void NativeConstruct()override;
 	void RemoveFromParent()override;
-	void Init(int32 _MaxPlayerCount);
 	bool RefreshMatchState(float _DeltaTime);
 
 private:

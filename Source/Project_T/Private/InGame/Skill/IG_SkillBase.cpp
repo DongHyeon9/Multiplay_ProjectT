@@ -1,33 +1,27 @@
-#include "InGame/Skill/IG_SkillBase.h"
+﻿#include "InGame/Skill/IG_SkillBase.h"
 #include "Net/UnrealNetwork.h"
 
-AIG_SkillBase::AIG_SkillBase()
+void AIG_SkillBase::InitSkill()
 {
-	PrimaryActorTick.bCanEverTick = true;
-	bReplicates = true;
+	bUseSkill = true;
+	coolDownHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_SkillBase::SkillInterval), coolDown);
 }
 
-void AIG_SkillBase::UseSkill()
+bool AIG_SkillBase::SkillInterval(float _DeltaTime)
 {
+	UseSkill();
+
+	return bUseSkill;
 }
 
-
-
-void AIG_SkillBase::BeginPlay()
+void AIG_SkillBase::SetSkillUse(bool _bIsUse)
 {
-	Super::BeginPlay();
-	UE_LOG(LogTemp, Log, TEXT("Skill Used: %s"), *SkillInfo.Name.ToString());
-}
-
-void AIG_SkillBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	bUseSkill = _bIsUse;
 }
 
 void AIG_SkillBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AIG_SkillBase, SkillInfo);
-}
 
+	DOREPLIFETIME(AIG_SkillBase, bUseSkill);
+}
