@@ -6,6 +6,10 @@
 #include "Containers/Ticker.h"
 #include "IG_GameState.generated.h"
 
+class AIGC_EnemyBase;
+
+enum class E_CHARACTER_STATE : uint8;
+
 UCLASS()
 class PROJECT_T_API AIG_GameState : public AGameState
 {
@@ -21,7 +25,19 @@ public:
 
 	FTSTicker::FDelegateHandle gameTimerHandle{};
 
+private:
+	TQueue<AIGC_EnemyBase*> enemyPool{};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameState Enemy Pool", meta = (AllowPrivateAccess = true))
+	TSubclassOf<AIGC_EnemyBase> enemyClass{};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameState Enemy Pool", meta = (AllowPrivateAccess = true))
+	int32 objectPoolDefaultSize{ 100 };
+
+
 public:
+	void BeginPlay()override;
+
 	void OnCompletePlayer();
 	void StartGame();
 	void EndGame();
@@ -31,4 +47,5 @@ public:
 
 private:
 	bool GameTimer(float _DeltaTime);
+	void OnEnemyStateChange(AIGC_EnemyBase* _Enemy, E_CHARACTER_STATE _NewState);
 };

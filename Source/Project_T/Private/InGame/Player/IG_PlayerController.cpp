@@ -11,6 +11,7 @@
 #include "Components/WidgetComponent.h"
 #include "InGame/Widget/IGW_Main.h"
 #include "GameFramework/PlayerState.h"
+#include "EngineUtils.h"
 
 AIG_PlayerController::AIG_PlayerController(const FObjectInitializer& _Initializer):
 	Super(_Initializer)
@@ -25,17 +26,13 @@ void AIG_PlayerController::PreInitializeComponents()
 	//playerMappingContext 설정하는 로직
 }
 
-void AIG_PlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AIG_PlayerController, userName);
-}
-
 void AIG_PlayerController::Server_InitPlayer_Implementation(const FString& _NewName)
 {
-	PTT_LOG(Warning, TEXT("%s"), *GetName());
-	userName = _NewName;
+	PTT_LOG(Warning, TEXT("%s : %s"), *GetName(), *_NewName);
+	
+	if (auto player = GetPawn<AIGC_Player>())
+		player->SetCharacterName(_NewName);
+
 	if (auto ps = GetPlayerState<APlayerState>())
 		ps->SetPlayerName(_NewName.RightChop(PLAYER_NAME_PREFIX.Len()));
 
@@ -45,6 +42,8 @@ void AIG_PlayerController::Server_InitPlayer_Implementation(const FString& _NewN
 
 bool AIG_PlayerController::Server_InitPlayer_Validate(const FString& _NewName)
 {
+	PTT_LOG(Warning, TEXT("%s : %s"), *GetName(), *_NewName);
+
 	return _NewName.StartsWith(PLAYER_NAME_PREFIX, ESearchCase::CaseSensitive);
 }
 
@@ -73,8 +72,15 @@ void AIG_PlayerController::Server_OnFinishEndEvent_Implementation()
 void AIG_PlayerController::Client_StartGame_Implementation()
 {
 	EnableInput(this);
-	if (auto player = GetPawn<AIGC_Player>())
-		player->GetStatusWidget()->SetHiddenInGame(false);
+	if (GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
+	{
+		TActorRange<AIG_CharacterBase> characters(GetWorld());
+		for (auto character : characters)
+		{
+			if (character != GetPawn())
+				character->GetStatusWidget()->SetHiddenInGame(false);
+		}
+	}
 
 	if (mainWidget && mainWidget->IsInViewport())
 	{
@@ -119,7 +125,9 @@ void AIG_PlayerController::BeginPlay()
 		{
 			subsystem->AddMappingContext(playerMappingContext, 0);
 		}
+#if !WITH_EDITOR
 		DisableInput(this);
+#endif
 
 		mainWidget = CreateWidget<UIGW_Main>(this, mainWidgetClass);
 		mainWidget->AddToViewport();
@@ -131,10 +139,4 @@ void AIG_PlayerController::BeginPlay()
 void AIG_PlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-}
-
-void AIG_PlayerController::OnRep_UpdateName()
-{
-	if (auto player = GetPawn<AIGC_Player>())
-		player->SetUserName(userName);
 }

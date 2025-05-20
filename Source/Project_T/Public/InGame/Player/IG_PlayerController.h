@@ -16,9 +16,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIG_PlayerController Input", meta = (AllowPrivateAccess = true))
 	UInputMappingContext* playerMappingContext{};
 
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_UpdateName, VisibleAnywhere, BlueprintReadOnly, category = "AIG_PlayerController", meta = (AllowPrivateAccess = true))
-	FString userName{};
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_PlayerController", meta = (AllowPrivateAccess = true))
 	TSubclassOf<UIGW_Main> mainWidgetClass{};
 
@@ -28,7 +25,6 @@ private:
 public:
 	AIG_PlayerController(const FObjectInitializer& _Initializer);
 	void PreInitializeComponents()override;
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_InitPlayer(const FString& _NewName);
@@ -64,7 +60,5 @@ protected:
 	void SetupInputComponent()override;
 
 private:
-	UFUNCTION()
-	void OnRep_UpdateName();
 
 };

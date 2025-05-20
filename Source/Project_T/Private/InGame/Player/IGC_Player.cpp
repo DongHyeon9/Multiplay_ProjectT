@@ -11,7 +11,6 @@
 #include "InputMappingContext.h"
 #include "T_GameInstance.h"
 #include "Components/WidgetComponent.h"
-#include "InGame/Widget/IGW_CharacterStatus.h"
 #include "InGame/Player/IG_PlayerController.h"
 
 AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
@@ -28,6 +27,7 @@ AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	springArmComp->CameraLagSpeed = 3.0f;
 	springArmComp->bUsePawnControlRotation = true;
 	springArmComp->bInheritRoll = true;
+	springArmComp->bInheritPitch = false;
 	springArmComp->bInheritYaw = true;
 	springArmComp->bDoCollisionTest = false;
 	bUseControllerRotationYaw = false;
@@ -91,13 +91,6 @@ void AIGC_Player::PreInitializeComponents()
 	auto& moveBackward = characterMappingContext->MapKey(moveAction, EKeys::S);
 	moveBackward.Modifiers.Emplace(swizzleAxis);
 	moveBackward.Modifiers.Emplace(negate);
-}
-
-void AIGC_Player::SetUserName(const FString& _NewName)
-{
-	FString userName{ _NewName.RightChop(PLAYER_NAME_PREFIX.Len()) };
-	if (auto widget = Cast<UIGW_CharacterStatus>(GetStatusWidget()->GetWidget()))
-		widget->SetName(FText::FromString(userName));
 }
 
 void AIGC_Player::Move(const FInputActionValue& _Value)

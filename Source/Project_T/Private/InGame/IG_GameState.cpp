@@ -2,6 +2,25 @@
 #include "InGame/Player/IG_PlayerController.h"
 #include "InGame/IG_GameMode.h"
 #include "Net/UnrealNetwork.h"
+#include "InGame/Enemy/IGC_EnemyBase.h"
+
+void AIG_GameState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UWorld* world{ GetWorld() };
+	for (int32 i = 0; i < objectPoolDefaultSize; ++i)
+	{
+		FTransform spawnTransform{};
+		auto enemy = world->SpawnActorDeferred<AIGC_EnemyBase>(enemyClass, spawnTransform, this);
+		//TODO
+		//스폰 전 처리할 로직
+		enemy->FinishSpawning(spawnTransform);
+		enemy->onEnemyState.BindUObject(this, &AIG_GameState::OnEnemyStateChange);
+		enemyPool.Enqueue(enemy);
+	}
+	PTT_LOG(Warning, TEXT(""));
+}
 
 void AIG_GameState::OnCompletePlayer()
 {
@@ -88,6 +107,11 @@ bool AIG_GameState::GameTimer(float _DeltaTime)
 		EndGame();
 	}
 	return !bIsEnd;
+}
+
+void AIG_GameState::OnEnemyStateChange(AIGC_EnemyBase* _Enemy, E_CHARACTER_STATE _NewState)
+{
+
 }
 
 void AIG_GameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

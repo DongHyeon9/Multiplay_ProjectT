@@ -21,16 +21,24 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIG_CharacterBase Defulat", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UWidgetComponent> statusWidget{};
 
+private:
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_UpdateName, VisibleAnywhere, BlueprintReadOnly, category = "AIGC_Player", meta = (AllowPrivateAccess = true))
+	FString characterName{};
+
 public:
 	AIG_CharacterBase(const FObjectInitializer& _Intializer);
 
 public:
 	FORCEINLINE TObjectPtr<UIG_StatComponent> GetStatComp()const { return statComp; }
 	FORCEINLINE TObjectPtr<UWidgetComponent> GetStatusWidget()const { return statusWidget; }
+	virtual void SetCharacterName(const FString& _NewName);
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	void BeginPlay() override;
 
 private:
+	UFUNCTION()
+	void OnRep_UpdateName();
 
 };

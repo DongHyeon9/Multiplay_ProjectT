@@ -38,7 +38,6 @@ private:
 public:	
 	AIGC_Player(const FObjectInitializer& _Intializer);
 	void SetupPlayerInputComponent(UInputComponent* _PlayerInputComponent) override;
-	void SetUserName(const FString& _NewName);
 
 public:
 	FORCEINLINE TObjectPtr<UIG_SkillComponent> GetSkillComp()const { return skillComp; }
