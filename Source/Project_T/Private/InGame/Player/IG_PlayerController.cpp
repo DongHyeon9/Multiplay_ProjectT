@@ -52,21 +52,8 @@ void AIG_PlayerController::Server_OnFinishStartEvent_Implementation()
 	PTT_LOG(Warning, TEXT("%s"), *GetName());
 
 	if (auto gs = GetWorld()->GetGameState<AIG_GameState>())
-		gs->StartGame();
+		gs->RequestStartGame();
 
-}
-
-void AIG_PlayerController::Server_OnFinishEndEvent_Implementation()
-{
-	PTT_LOG(Warning, TEXT("%s"), *GetName());
-
-	if (auto gs = GetWorld()->GetGameState<AIG_GameState>())
-		gs->ComputeResult();
-
-	if (mainWidget && mainWidget->IsInViewport())
-	{
-		mainWidget->StartGame();
-	}
 }
 
 void AIG_PlayerController::Client_StartGame_Implementation()
@@ -97,13 +84,6 @@ void AIG_PlayerController::Client_StartEvent_Implementation()
 	}
 }
 
-void AIG_PlayerController::Client_EndGame_Implementation()
-{
-	// TODO
-	// 게임 종료시 처리해야될 로직
-	// 결과창 UI
-}
-
 void AIG_PlayerController::Client_EndEvent_Implementation()
 {
 	if (mainWidget && mainWidget->IsInViewport())
@@ -115,9 +95,10 @@ void AIG_PlayerController::Client_EndEvent_Implementation()
 void AIG_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
+#if !WITH_EDITOR
 	if (GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
 	{
+#endif
 		SetInputMode(FInputModeGameOnly{});
 		SetShowMouseCursor(false);
 
@@ -132,11 +113,33 @@ void AIG_PlayerController::BeginPlay()
 		mainWidget = CreateWidget<UIGW_Main>(this, mainWidgetClass);
 		mainWidget->AddToViewport();
 		mainWidget->onFinishStartAnim.BindDynamic(this, &AIG_PlayerController::Server_OnFinishStartEvent);
-		mainWidget->onFinishEndAnim.BindDynamic(this, &AIG_PlayerController::Server_OnFinishEndEvent);
+		mainWidget->onFinishEndAnim.BindDynamic(this, &AIG_PlayerController::PrintResult);
+#if !WITH_EDITOR
 	}
+#endif
+
+#if WITH_EDITOR
+	if (mainWidget && mainWidget->IsInViewport())
+	{
+		mainWidget->InitWidget();
+		mainWidget->InitTimer(GetWorld()->GetGameState<AIG_GameState>());
+	}
+#endif
 }
 
 void AIG_PlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
+}
+
+void AIG_PlayerController::PrintResult()
+{
+	// TODO
+	// 게임 종료시 처리해야될 로직
+	// 결과창 UI
+	auto gs = GetWorld()->GetGameState<AIG_GameState>();
+	for (auto ps : gs->PlayerArray) 
+	{
+		PRINTSTR(-1, 10.0f, FColor::Green, TEXT("%s : %.1f"), *ps->GetPlayerName(), ps->GetScore());
+	}
 }

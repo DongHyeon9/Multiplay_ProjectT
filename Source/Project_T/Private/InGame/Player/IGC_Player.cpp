@@ -61,18 +61,20 @@ void AIGC_Player::BeginPlay()
 
 	GetStatusWidget()->SetHiddenInGame(true);
 
+#if !WITH_EDITOR
 	if (GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
 	{
+#endif
 		if (APlayerController* playerController = Cast<APlayerController>(Controller))
 			if (UEnhancedInputLocalPlayerSubsystem* subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerController->GetLocalPlayer()))
 				subsystem->AddMappingContext(characterMappingContext, 0);
-
+#if !WITH_EDITOR
 		FString userName{ GetGameInstance<UT_GameInstance>()->GetUserName() };
 
 		if (auto pc = Cast<AIG_PlayerController>(GetController()))
 			pc->Server_InitPlayer(userName);
 	}
-
+#endif
 }
 
 void AIGC_Player::PreInitializeComponents()
