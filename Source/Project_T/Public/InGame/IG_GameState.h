@@ -41,9 +41,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameState Enemy Pool", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UCurveFloat> difficultyCurve{};
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameState Enemy Pool", meta = (AllowPrivateAccess = true))
+	float spawnInterval{ 1.0f };
+
 	FTSTicker::FDelegateHandle spawnHandle{};
 
-	float acc{};
+	float curveLength{};
 
 public:
 	void BeginPlay()override;

@@ -3,6 +3,8 @@
 #include "InGame/IG_GameMode.h"
 #include "Net/UnrealNetwork.h"
 #include "InGame/Enemy/IGC_Enemy.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Components/CapsuleComponent.h"
 
 void AIG_GameState::BeginPlay()
 {
@@ -92,11 +94,15 @@ bool AIG_GameState::EnemySpawn(float _DeltaTime)
 {
 	if (bIsPlaying) return false;
 
-	acc += _DeltaTime;
-	// TODO
-	// 커브값에 따라 소환 로직
-	auto monster{ GetEnemyInPool() };
-	ActiveEnemy(monster);
+	const float timeInCurve{ curveLength / gameTime };
+	int32 spawnCount{ static_cast<int32>(difficultyCurve->GetFloatValue(timeInCurve)) };
+	PTT_LOG(Warning, TEXT("Spawn Count : %d"), spawnCount);
+
+	for (int32 i = 0; i < spawnCount; ++i)
+	{
+		auto monster{ GetEnemyInPool() };
+		ActiveEnemy(monster);
+	}
 
 	return true;
 }
@@ -118,9 +124,12 @@ void AIG_GameState::StartGame()
 			pc->Client_StartGame();
 		}
 	}
-
+	float curveMinValue{};
+	float curveMaxValue{};
+	difficultyCurve->GetValueRange(curveMinValue, curveMaxValue);
+	curveLength = curveMaxValue - curveMinValue;
 	gameTimerHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::GameTimer), 1.0f);
-	//spawnHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::EnemySpawn));
+	spawnHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::EnemySpawn), spawnInterval);
 }
 
 void AIG_GameState::EndGame()
@@ -146,9 +155,73 @@ void AIG_GameState::ExpandPool()
 
 void AIG_GameState::ActiveEnemy(AIGC_Enemy* _Enemy)
 {
-	// TODO
-	// 적 위치 선정
+	UWorld* world{ GetWorld() };
+	TArray<TPair<FVector, float>> playerCameraInfo{};
+	playerCameraInfo.Reserve(world->GetNumPlayerControllers());
+	const float capsuleRadius{ _Enemy->GetCapsuleComponent()->GetScaledCapsuleRadius() };
+	for (auto pIter = world->GetPlayerControllerIterator(); pIter; ++pIter)
+	{
+		auto pc = Cast<AIG_PlayerController>(pIter->Get());
+		if (!pc) continue;
+		const float traceDistance{ 10000.0f };
 
+		//좌측 상단 스크린의 월드좌표 구하기
+		FVector worldLocationTL{}, worldDirectionTL{};
+		pc->DeprojectScreenPositionToWorld(0, 0, worldLocationTL, worldDirectionTL);
+		FVector targetLocation{ worldDirectionTL * traceDistance + worldLocationTL };
+		FHitResult outResult{};
+		FCollisionObjectQueryParams param{};
+		if (world->LineTraceSingleByObjectType(
+			outResult,
+			worldLocationTL,
+			targetLocation,
+			UEngineTypes::ConvertToObjectType(ECC_WorldStatic)))
+		{
+			worldLocationTL = outResult.ImpactPoint;
+		}
+
+		//우측 하단 스크린의 월드좌표 구하기
+		int32 sizeX{}, sizeY{};
+		pc->GetViewportSize(sizeX, sizeY);
+		FVector worldLocationBR{}, worldDirectionBR{};
+		pc->DeprojectScreenPositionToWorld(sizeX, sizeY, worldLocationBR, worldDirectionBR);
+		targetLocation = worldDirectionBR * traceDistance + worldLocationBR;
+		if (world->LineTraceSingleByObjectType(
+			outResult,
+			worldDirectionBR,
+			targetLocation,
+			UEngineTypes::ConvertToObjectType(ECC_WorldStatic)))
+		{
+			worldLocationBR = outResult.ImpactPoint;
+		}
+
+		//중앙 좌표와 거리 구하기
+		FVector center{ (worldLocationTL + worldLocationBR) * 0.5f };
+		float radius{ static_cast<float>((center - worldLocationTL).Length()) };
+		playerCameraInfo.Emplace(center, abs(radius) + capsuleRadius);
+	}
+
+	const float rangeMin{ -100.0f };
+	const float rangeMax{ 100.0f };
+	FVector randomDir{ FMath::FRandRange(rangeMin,rangeMax),FMath::FRandRange(rangeMin,rangeMax) ,0.0f };
+	randomDir.Normalize();
+
+	FVector spawnLocation{};
+
+	// 배열을 순회하며
+	// 현재 위치가 카메라의 범위에 포함되어 있으면
+	// 그 거리만큼 randomDir방향으로 밀어낸다
+	for (const auto& cameraInfo : playerCameraInfo)
+	{
+		const float distance{ static_cast<float>(abs((spawnLocation - cameraInfo.Key).Length())) };
+		if (distance >= cameraInfo.Value) continue;
+		const float moveDistance{ cameraInfo.Value - distance };
+		spawnLocation += randomDir * moveDistance;
+	}
+
+	spawnLocation.Z = _Enemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	PTT_LOG(Warning, TEXT("%s SpawnLocation : %s"), *_Enemy->GetName(), *spawnLocation.ToString());
+	_Enemy->SetActorLocation(spawnLocation);
 	_Enemy->SetActive(true);
 }
 
