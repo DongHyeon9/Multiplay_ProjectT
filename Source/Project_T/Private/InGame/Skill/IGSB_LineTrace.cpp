@@ -16,16 +16,15 @@ void AIGSB_LineTrace::InitSkill()
 
 void AIGSB_LineTrace::UseSkill()
 {
-	FHitResult Hit;
+	TArray<FHitResult> Hit;
 	FVector StartLocation = GetOwner()->GetActorLocation();
 	FVector EndLocation = StartLocation + (GetOwner()->GetActorForwardVector() * 1000.f);
 
-	bool Result = UKismetSystemLibrary::BoxTraceSingle(
+	bool Result = UKismetSystemLibrary::SphereTraceMulti(
 		GetWorld(),
 		StartLocation,
 		EndLocation,
-		FVector(10.f, 10.f, 10.f),
-		FRotator(0.f, 0.f, 0.f),
+		50.f,
 		ETraceTypeQuery::TraceTypeQuery3,
 		false,
 		{
