@@ -3,16 +3,19 @@
 #include "InGame/IG_GameMode.h"
 #include "Net/UnrealNetwork.h"
 #include "InGame/Enemy/IGC_Enemy.h"
-#include "GameFramework/PlayerState.h"
 
 void AIG_GameState::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	for (int32 i = 0; i < objectPoolDefaultSize; ++i)
+	if (HasAuthority())
 	{
-		auto enemy{ SpawnEnemy() };
-		enemyPool.Enqueue(enemy);
+		for (int32 i = 0; i < objectPoolDefaultSize; ++i)
+		{
+			PTT_LOG(Warning, TEXT("Spawn : %d"), i);
+			auto enemy{ SpawnEnemy() };
+			enemyPool.Enqueue(enemy);
+		}
 	}
 #if WITH_EDITOR
 	StartGame();
@@ -32,7 +35,7 @@ AIGC_Enemy* AIG_GameState::GetEnemyInPool()
 AIGC_Enemy* AIG_GameState::SpawnEnemy()
 {
 	FTransform spawnTransform{};
-	AIGC_Enemy* result{ GetWorld()->SpawnActorDeferred<AIGC_Enemy>(enemyClass, spawnTransform, this) };
+	AIGC_Enemy* result{ GetWorld()->SpawnActorDeferred<AIGC_Enemy>(enemyClass, spawnTransform, this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
 	result->InitEnemy();
 	result->FinishSpawning(spawnTransform);
 	result->onEnemyState.BindUObject(this, &AIG_GameState::OnEnemyStateChange);
@@ -40,26 +43,23 @@ AIGC_Enemy* AIG_GameState::SpawnEnemy()
 	return result;
 }
 
-void AIG_GameState::OnCompletePlayer()
+void AIG_GameState::OnInitPlayer()
 {
 	++compeletedPlayer;
 	PTT_LOG(Warning, TEXT("compeletedPlayer : %d"), compeletedPlayer.load());
-	if (compeletedPlayer == MAX_PLAYER_COUNT)
+	if (compeletedPlayer != MAX_PLAYER_COUNT) return;
+
+	UWorld* world = GetWorld();
+	check(world);
+	compeletedPlayer = 0;
+	auto gm = world->GetAuthGameMode<AIG_GameMode>();
+	check(gm);
+	gm->OnCompleteAllPlayer();
+	for (auto pIter = world->GetPlayerControllerIterator(); pIter; ++pIter)
 	{
-		compeletedPlayer = 0;
-		UWorld* world = GetWorld();
-		check(world);
-
-		auto gm = world->GetAuthGameMode<AIG_GameMode>();
-		check(gm);
-		gm->OnCompleteAllPlayer();
-
-		for (auto pIter = world->GetPlayerControllerIterator(); pIter; ++pIter)
+		if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
 		{
-			if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
-			{
-				pc->Client_StartEvent();
-			}
+			pc->Client_StartEvent();
 		}
 	}
 }
@@ -92,6 +92,9 @@ bool AIG_GameState::EnemySpawn(float _DeltaTime)
 {
 	if (bIsPlaying) return false;
 
+	acc += _DeltaTime;
+	// TODO
+	// 커브값에 따라 소환 로직
 	auto monster{ GetEnemyInPool() };
 	ActiveEnemy(monster);
 
@@ -100,8 +103,8 @@ bool AIG_GameState::EnemySpawn(float _DeltaTime)
 
 void AIG_GameState::OnEnemyStateChange(AIGC_Enemy* _Enemy, E_CHARACTER_STATE _NewState)
 {
-	_Enemy->SetActive(false);
-	enemyPool.Enqueue(_Enemy);
+	if (_NewState == E_CHARACTER_STATE::DISABLE)
+		enemyPool.Enqueue(_Enemy);
 }
 
 void AIG_GameState::StartGame()
@@ -117,7 +120,7 @@ void AIG_GameState::StartGame()
 	}
 
 	gameTimerHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::GameTimer), 1.0f);
-	spawnHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::EnemySpawn));
+	//spawnHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::EnemySpawn));
 }
 
 void AIG_GameState::EndGame()

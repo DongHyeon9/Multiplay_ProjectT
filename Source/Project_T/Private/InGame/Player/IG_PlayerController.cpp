@@ -26,18 +26,22 @@ void AIG_PlayerController::PreInitializeComponents()
 	//playerMappingContext 설정하는 로직
 }
 
+void AIG_PlayerController::InitPlayer(const FCharacterData& _NewData)
+{
+	auto character = GetPawn<AIGC_Player>();
+	if (character)
+		character->SetCharacterData(_NewData);
+}
+
 void AIG_PlayerController::Server_InitPlayer_Implementation(const FString& _NewName)
 {
 	PTT_LOG(Warning, TEXT("%s : %s"), *GetName(), *_NewName);
 	
-	if (auto player = GetPawn<AIGC_Player>())
-		player->SetCharacterName(_NewName);
-
 	if (auto ps = GetPlayerState<APlayerState>())
 		ps->SetPlayerName(_NewName.RightChop(PLAYER_NAME_PREFIX.Len()));
 
 	if (auto gs = GetWorld()->GetGameState<AIG_GameState>())
-		gs->OnCompletePlayer();
+		gs->OnInitPlayer();
 }
 
 bool AIG_PlayerController::Server_InitPlayer_Validate(const FString& _NewName)
@@ -53,7 +57,6 @@ void AIG_PlayerController::Server_OnFinishStartEvent_Implementation()
 
 	if (auto gs = GetWorld()->GetGameState<AIG_GameState>())
 		gs->RequestStartGame();
-
 }
 
 void AIG_PlayerController::Client_StartGame_Implementation()

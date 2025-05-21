@@ -25,6 +25,7 @@ private:
 public:
 	AIG_PlayerController(const FObjectInitializer& _Initializer);
 	void PreInitializeComponents()override;
+	void InitPlayer(const FCharacterData& _NewData);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_InitPlayer(const FString& _NewName);

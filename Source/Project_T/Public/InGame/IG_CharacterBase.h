@@ -22,8 +22,8 @@ private:
 	TObjectPtr<UWidgetComponent> statusWidget{};
 
 private:
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_UpdateName, VisibleAnywhere, BlueprintReadOnly, category = "AIGC_Player", meta = (AllowPrivateAccess = true))
-	FString characterName{};
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_UpdateCharacterData, VisibleAnywhere, BlueprintReadOnly, category = "AIG_CharacterBase", meta = (AllowPrivateAccess = true))
+	FCharacterData characterData{};
 
 public:
 	AIG_CharacterBase(const FObjectInitializer& _Intializer);
@@ -31,7 +31,8 @@ public:
 public:
 	FORCEINLINE TObjectPtr<UIG_StatComponent> GetStatComp()const { return statComp; }
 	FORCEINLINE TObjectPtr<UWidgetComponent> GetStatusWidget()const { return statusWidget; }
-	virtual void SetCharacterName(const FString& _NewName);
+	FORCEINLINE const FCharacterData& GetCharacterData()const { return characterData; }
+	virtual void SetCharacterData(const FCharacterData& _NewData);
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
@@ -39,6 +40,6 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnRep_UpdateName();
+	void OnRep_UpdateCharacterData();
 
 };

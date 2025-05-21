@@ -37,12 +37,6 @@ AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.f, 0.0f);
 
 	camera->SetupAttachment(springArmComp);
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_PLAYER(TEXT("/Game/02_Mesh/PlayerCharacter/SKM_Manny"));
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ABP_PLAYER(TEXT("/Game/06_Animation/PlayerCharacter/ABP_Manny"));
-
-	if (SK_PLAYER.Succeeded()) GetMesh()->SetSkeletalMesh(SK_PLAYER.Object);
-	if (ABP_PLAYER.Succeeded())	GetMesh()->SetAnimInstanceClass(ABP_PLAYER.Class);
 }
 
 void AIGC_Player::SetupPlayerInputComponent(UInputComponent* _PlayerInputComponent)

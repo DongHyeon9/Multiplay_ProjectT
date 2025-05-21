@@ -7,6 +7,7 @@
 #include "IG_GameState.generated.h"
 
 class AIGC_Enemy;
+class AIG_PlayerController;
 
 enum class E_CHARACTER_STATE : uint8;
 
@@ -42,11 +43,13 @@ private:
 
 	FTSTicker::FDelegateHandle spawnHandle{};
 
+	float acc{};
+
 public:
 	void BeginPlay()override;
 	AIGC_Enemy* GetEnemyInPool();
 
-	void OnCompletePlayer();
+	void OnInitPlayer();
 	void RequestStartGame();
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	FORCEINLINE int32 GetTimer()const { return static_cast<int32>(currentTime); }

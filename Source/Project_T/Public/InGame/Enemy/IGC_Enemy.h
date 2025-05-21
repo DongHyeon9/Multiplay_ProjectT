@@ -15,6 +15,12 @@ class PROJECT_T_API AIGC_Enemy : public AIG_CharacterBase
 public:
 	FOnEnemyStateDelegate onEnemyState{};
 
+private:
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,category="AIGC_Enemy",meta=(AllowPrivateAccess=true))
+	float disableDelay{ 5.0f };
+
+	FTimerHandle disableHandle{};
+
 public:
 	AIGC_Enemy(const FObjectInitializer& _Initializer);
 	void BeginPlay()override;
@@ -23,4 +29,5 @@ public:
 
 private:
 	void OnChangeState(E_CHARACTER_STATE _NewState);
+	void OnDelay_ChangeDisable();
 };
