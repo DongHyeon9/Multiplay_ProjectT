@@ -6,7 +6,8 @@
 #include "Containers/Ticker.h"
 #include "IG_GameState.generated.h"
 
-class AIGC_EnemyBase;
+class AIGC_Enemy;
+class AIG_PlayerController;
 
 enum class E_CHARACTER_STATE : uint8;
 
@@ -23,29 +24,45 @@ public:
 	UPROPERTY(Transient, Replicated, VisibleAnywhere, BlueprintReadOnly, category = "AIG_GameState", meta = (AllowPrivateAccess = true))
 	float currentTime{};
 
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, category = "AIG_GameState", meta = (AllowPrivateAccess = true))
+	bool bIsPlaying{};
+
 	FTSTicker::FDelegateHandle gameTimerHandle{};
 
 private:
-	TQueue<AIGC_EnemyBase*> enemyPool{};
+	TQueue<AIGC_Enemy*> enemyPool{};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameState Enemy Pool", meta = (AllowPrivateAccess = true))
-	TSubclassOf<AIGC_EnemyBase> enemyClass{};
+	TSubclassOf<AIGC_Enemy> enemyClass{};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameState Enemy Pool", meta = (AllowPrivateAccess = true))
 	int32 objectPoolDefaultSize{ 100 };
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameState Enemy Pool", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UCurveFloat> difficultyCurve{};
+
+	FTSTicker::FDelegateHandle spawnHandle{};
+
+	float acc{};
 
 public:
 	void BeginPlay()override;
+	AIGC_Enemy* GetEnemyInPool();
 
-	void OnCompletePlayer();
-	void StartGame();
-	void EndGame();
-	void ComputeResult();
+	void OnInitPlayer();
+	void RequestStartGame();
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	FORCEINLINE int32 GetTimer()const { return static_cast<int32>(currentTime); }
 
 private:
 	bool GameTimer(float _DeltaTime);
-	void OnEnemyStateChange(AIGC_EnemyBase* _Enemy, E_CHARACTER_STATE _NewState);
+	void StartGame();
+	void EndGame();
+
+	void OnEnemyStateChange(AIGC_Enemy* _Enemy, E_CHARACTER_STATE _NewState);
+
+	bool EnemySpawn(float _DeltaTime);
+	void ExpandPool();
+	void ActiveEnemy(AIGC_Enemy* _Enemy);
+	AIGC_Enemy* SpawnEnemy();
 };

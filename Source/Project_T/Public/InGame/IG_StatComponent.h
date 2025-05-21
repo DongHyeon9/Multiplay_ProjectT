@@ -4,13 +4,6 @@
 #include "Components/ActorComponent.h"
 #include "IG_StatComponent.generated.h"
 
-UENUM(BlueprintType)
-enum class E_CHARACTER_STATE : uint8 {
-	DISABLE		UMETA(DisplayName = "Disable"),
-	ENABLE		UMETA(DisplayName = "Enable"),
-	DEAD		UMETA(DisplayName = "Dead"),
-};
-
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangeStateDelegate, E_CHARACTER_STATE);
 
 UCLASS( ClassGroup=(Project_T), meta=(BlueprintSpawnableComponent) )
@@ -26,6 +19,7 @@ private:
 
 public:	
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	void SetCharacterState(E_CHARACTER_STATE _NewState);
 
 private:
 	UFUNCTION()

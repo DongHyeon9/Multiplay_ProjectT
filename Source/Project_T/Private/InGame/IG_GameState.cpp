@@ -2,74 +2,129 @@
 #include "InGame/Player/IG_PlayerController.h"
 #include "InGame/IG_GameMode.h"
 #include "Net/UnrealNetwork.h"
-#include "InGame/Enemy/IGC_EnemyBase.h"
+#include "InGame/Enemy/IGC_Enemy.h"
 
 void AIG_GameState::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UWorld* world{ GetWorld() };
-	for (int32 i = 0; i < objectPoolDefaultSize; ++i)
+	
+	if (HasAuthority())
 	{
-		FTransform spawnTransform{};
-		auto enemy = world->SpawnActorDeferred<AIGC_EnemyBase>(enemyClass, spawnTransform, this);
-		//TODO
-		//스폰 전 처리할 로직
-		enemy->FinishSpawning(spawnTransform);
-		enemy->onEnemyState.BindUObject(this, &AIG_GameState::OnEnemyStateChange);
-		enemyPool.Enqueue(enemy);
+		for (int32 i = 0; i < objectPoolDefaultSize; ++i)
+		{
+			PTT_LOG(Warning, TEXT("Spawn : %d"), i);
+			auto enemy{ SpawnEnemy() };
+			enemyPool.Enqueue(enemy);
+		}
 	}
-	PTT_LOG(Warning, TEXT(""));
+#if WITH_EDITOR
+	StartGame();
+#endif
 }
 
-void AIG_GameState::OnCompletePlayer()
+AIGC_Enemy* AIG_GameState::GetEnemyInPool()
+{
+	if (enemyPool.IsEmpty())
+		ExpandPool();
+
+	AIGC_Enemy* monster{};
+	enemyPool.Dequeue(monster);
+	return monster;
+}
+
+AIGC_Enemy* AIG_GameState::SpawnEnemy()
+{
+	FTransform spawnTransform{};
+	AIGC_Enemy* result{ GetWorld()->SpawnActorDeferred<AIGC_Enemy>(enemyClass, spawnTransform, this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
+	result->InitEnemy();
+	result->FinishSpawning(spawnTransform);
+	result->onEnemyState.BindUObject(this, &AIG_GameState::OnEnemyStateChange);
+
+	return result;
+}
+
+void AIG_GameState::OnInitPlayer()
+{
+	++compeletedPlayer;
+	PTT_LOG(Warning, TEXT("compeletedPlayer : %d"), compeletedPlayer.load());
+	if (compeletedPlayer != MAX_PLAYER_COUNT) return;
+
+	UWorld* world = GetWorld();
+	check(world);
+	compeletedPlayer = 0;
+	auto gm = world->GetAuthGameMode<AIG_GameMode>();
+	check(gm);
+	gm->OnCompleteAllPlayer();
+	for (auto pIter = world->GetPlayerControllerIterator(); pIter; ++pIter)
+	{
+		if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
+		{
+			pc->Client_StartEvent();
+		}
+	}
+}
+
+void AIG_GameState::RequestStartGame()
 {
 	++compeletedPlayer;
 	PTT_LOG(Warning, TEXT("compeletedPlayer : %d"), compeletedPlayer.load());
 	if (compeletedPlayer == MAX_PLAYER_COUNT)
 	{
 		compeletedPlayer = 0;
-		UWorld* world = GetWorld();
-		check(world);
 
-		auto gm = world->GetAuthGameMode<AIG_GameMode>();
-		check(gm);
-		gm->OnCompleteAllPlayer();
-
-		for (auto pIter = world->GetPlayerControllerIterator(); pIter; ++pIter)
-		{
-			if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
-			{
-				pc->Client_StartEvent();
-			}
-		}
+		StartGame();
 	}
+}
+
+bool AIG_GameState::GameTimer(float _DeltaTime)
+{
+	--currentTime;
+	PTT_LOG(Warning, TEXT("%.1f"), currentTime);
+	bIsPlaying = currentTime - KINDA_SMALL_NUMBER <= 0.0f;
+	if (bIsPlaying)
+	{
+		EndGame();
+	}
+	return !bIsPlaying;
+}
+
+bool AIG_GameState::EnemySpawn(float _DeltaTime)
+{
+	if (bIsPlaying) return false;
+
+	acc += _DeltaTime;
+	// TODO
+	// 커브값에 따라 소환 로직
+	auto monster{ GetEnemyInPool() };
+	ActiveEnemy(monster);
+
+	return true;
+}
+
+void AIG_GameState::OnEnemyStateChange(AIGC_Enemy* _Enemy, E_CHARACTER_STATE _NewState)
+{
+	if (_NewState == E_CHARACTER_STATE::DISABLE)
+		enemyPool.Enqueue(_Enemy);
 }
 
 void AIG_GameState::StartGame()
 {
-	++compeletedPlayer;
-	PTT_LOG(Warning, TEXT("compeletedPlayer : %d"), compeletedPlayer.load());
-	if (compeletedPlayer == MAX_PLAYER_COUNT)
+	currentTime = gameTime;
+
+	for (auto pIter = GetWorld()->GetPlayerControllerIterator(); pIter; ++pIter)
 	{
-		compeletedPlayer = 0;
-		currentTime = gameTime;
-
-		for (auto pIter = GetWorld()->GetPlayerControllerIterator(); pIter; ++pIter)
+		if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
 		{
-			if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
-			{
-				pc->Client_StartGame();
-			}
+			pc->Client_StartGame();
 		}
-
-		gameTimerHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::GameTimer), 1.0);
 	}
+
+	gameTimerHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::GameTimer), 1.0f);
+	//spawnHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::EnemySpawn));
 }
 
 void AIG_GameState::EndGame()
 {
-	PTT_LOG(Warning, TEXT(""));
 	for (auto pIter = GetWorld()->GetPlayerControllerIterator(); pIter; ++pIter)
 	{
 		if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
@@ -79,39 +134,22 @@ void AIG_GameState::EndGame()
 	}
 }
 
-void AIG_GameState::ComputeResult()
+void AIG_GameState::ExpandPool()
 {
-	++compeletedPlayer;
-	PTT_LOG(Warning, TEXT("compeletedPlayer : %d"), compeletedPlayer.load());
-	if (compeletedPlayer == MAX_PLAYER_COUNT)
+	int32 newSize = objectPoolDefaultSize * 1.5;
+	for (int32 i = objectPoolDefaultSize; i < newSize; ++i)
 	{
-		compeletedPlayer = 0;
-
-		for (auto pIter = GetWorld()->GetPlayerControllerIterator(); pIter; ++pIter)
-		{
-			if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
-			{
-				pc->Client_EndGame();
-			}
-		}
+		auto enemy{ SpawnEnemy() };
+		enemyPool.Enqueue(enemy);
 	}
 }
 
-bool AIG_GameState::GameTimer(float _DeltaTime)
+void AIG_GameState::ActiveEnemy(AIGC_Enemy* _Enemy)
 {
-	--currentTime;
-	PTT_LOG(Warning, TEXT("%.1f"), currentTime);
-	bool bIsEnd{ currentTime - KINDA_SMALL_NUMBER <= 0.0f };
-	if (bIsEnd)
-	{
-		EndGame();
-	}
-	return !bIsEnd;
-}
+	// TODO
+	// 적 위치 선정
 
-void AIG_GameState::OnEnemyStateChange(AIGC_EnemyBase* _Enemy, E_CHARACTER_STATE _NewState)
-{
-
+	_Enemy->SetActive(true);
 }
 
 void AIG_GameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

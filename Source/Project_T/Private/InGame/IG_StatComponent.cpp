@@ -8,6 +8,12 @@ void UIG_StatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(UIG_StatComponent, characterState);
 }
 
+void UIG_StatComponent::SetCharacterState(E_CHARACTER_STATE _NewState)
+{
+	characterState = _NewState;
+	onChangeState.Broadcast(characterState);
+}
+
 void UIG_StatComponent::OnRep_StateChange()
 {
 	onChangeState.Broadcast(characterState);

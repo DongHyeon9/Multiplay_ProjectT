@@ -1,5 +1,5 @@
 #include "InGame/Skill/IGSB_Chain.h"
-#include "InGame/Enemy/IGC_EnemyBase.h"
+#include "InGame/Enemy/IGC_Enemy.h"
 #include "Kismet/GameplayStatics.h"
 
 void AIGSB_Chain::InitSkill()
@@ -15,7 +15,7 @@ void AIGSB_Chain::InitSkill()
 void AIGSB_Chain::UseSkill()
 {
 	TArray<AActor*> Targets;
-	TArray<AIGC_EnemyBase*> Enemys;
+	TArray<AIGC_Enemy*> Enemys;
 
 	auto* CurrentTarget = UGameplayStatics::GetActorOfClass(GetWorld(), AActor::StaticClass());
 

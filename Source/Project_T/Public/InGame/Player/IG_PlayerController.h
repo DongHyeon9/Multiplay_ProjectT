@@ -25,6 +25,7 @@ private:
 public:
 	AIG_PlayerController(const FObjectInitializer& _Initializer);
 	void PreInitializeComponents()override;
+	void InitPlayer(const FCharacterData& _NewData);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_InitPlayer(const FString& _NewName);
@@ -35,10 +36,6 @@ public:
 	void Server_OnFinishStartEvent();
 	void Server_OnFinishStartEvent_Implementation();
 
-	UFUNCTION(Server, Reliable)
-	void Server_OnFinishEndEvent();
-	void Server_OnFinishEndEvent_Implementation();
-
 	UFUNCTION(Client, Reliable)
 	void Client_StartGame();
 	void Client_StartGame_Implementation();
@@ -46,10 +43,6 @@ public:
 	UFUNCTION(Client, Reliable)
 	void Client_StartEvent();
 	void Client_StartEvent_Implementation();
-
-	UFUNCTION(Client, Reliable)
-	void Client_EndGame();
-	void Client_EndGame_Implementation();
 
 	UFUNCTION(Client, Reliable)
 	void Client_EndEvent();
@@ -60,5 +53,6 @@ protected:
 	void SetupInputComponent()override;
 
 private:
-
+	UFUNCTION()
+	void PrintResult();
 };

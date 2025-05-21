@@ -8,6 +8,13 @@ UCLASS()
 class PROJECT_T_API AIG_GameMode : public AGameMode
 {
 	GENERATED_BODY()
+private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameMode", meta = (AllowPrivateAccess = true))
+	TArray<FColor> playerColor{ FColor::Red, FColor::Blue, FColor::Green };
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameMode", meta = (AllowPrivateAccess = true))
+	FColor defaultColor{ FColor::White };
+
 public:
 	void OnCompleteAllPlayer();
 };
