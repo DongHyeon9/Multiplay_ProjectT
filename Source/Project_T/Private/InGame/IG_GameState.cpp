@@ -174,7 +174,7 @@ void AIG_GameState::EndGame()
 
 void AIG_GameState::ExpandPool()
 {
-	int32 newSize{ objectPoolDefaultSize * 1.5 };
+	int32 newSize{ static_cast<int32>(objectPoolDefaultSize * 1.5) };
 	for (int32 i = objectPoolDefaultSize; i < newSize; ++i)
 	{
 		auto enemy{ SpawnEnemy() };
