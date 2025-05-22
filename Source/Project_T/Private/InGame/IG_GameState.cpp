@@ -26,14 +26,24 @@ void AIG_GameState::BeginPlay()
 	{
 		for (int32 i = 0; i < objectPoolDefaultSize; ++i)
 		{
-			PTT_LOG(Warning, TEXT("Spawn : %d"), i);
+			PTT_LOG(Warning, TEXT("Spawn : %d"), i + 1);
 			auto enemy{ SpawnEnemy() };
 			enemyPool.Enqueue(enemy);
 		}
 	}
+
 #if WITH_EDITOR
 	StartGame();
 #endif
+}
+
+void AIG_GameState::EndPlay(EEndPlayReason::Type _Reason)
+{
+	Super::EndPlay(_Reason);
+
+	FTSTicker& ticker{ FTSTicker::GetCoreTicker() };
+	if (gameTimerHandle.IsValid()) ticker.RemoveTicker(gameTimerHandle), gameTimerHandle.Reset();
+	if (spawnHandle.IsValid()) ticker.RemoveTicker(spawnHandle), spawnHandle.Reset();
 }
 
 AIGC_Enemy* AIG_GameState::GetEnemyInPool()
@@ -146,6 +156,13 @@ void AIG_GameState::StartGame()
 
 void AIG_GameState::EndGame()
 {
+	while (!enemyPool.IsEmpty())
+	{
+		AIGC_Enemy* monster{};
+		enemyPool.Dequeue(monster);
+		monster->Destroy();
+	}
+
 	for (auto pIter = GetWorld()->GetPlayerControllerIterator(); pIter; ++pIter)
 	{
 		if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
@@ -157,7 +174,7 @@ void AIG_GameState::EndGame()
 
 void AIG_GameState::ExpandPool()
 {
-	int32 newSize = objectPoolDefaultSize * 1.5;
+	int32 newSize{ objectPoolDefaultSize * 1.5 };
 	for (int32 i = objectPoolDefaultSize; i < newSize; ++i)
 	{
 		auto enemy{ SpawnEnemy() };
@@ -195,27 +212,31 @@ void AIG_GameState::ActiveEnemy(AIGC_Enemy* _Enemy)
 			worldLocationM = outResult.ImpactPoint;
 		}
 
-		//우측 하단 스크린의 월드좌표 구하기
-		FVector worldLocationBR{}, worldDirectionBR{};
-		pc->DeprojectScreenPositionToWorld(0, 0, worldLocationBR, worldDirectionBR);
-		targetLocation = worldDirectionBR * traceDistance + worldLocationBR;
+		//좌측 상단 스크린의 월드좌표 구하기
+		FVector worldLocationTL{}, worldDirectionTL{};
+		pc->DeprojectScreenPositionToWorld(0, 0, worldLocationTL, worldDirectionTL);
+		targetLocation = worldDirectionTL * traceDistance + worldLocationTL;
 		if (world->LineTraceSingleByObjectType(
 			outResult,
-			worldLocationBR,
+			worldLocationTL,
 			targetLocation,
 			UEngineTypes::ConvertToObjectType(ECC_WorldStatic)))
 		{
-			worldLocationBR = outResult.ImpactPoint;
+			worldLocationTL = outResult.ImpactPoint;
 		}
 		
 		//현재 스크린을 완전히 덮는 구의 반지름 구하기
-		float radius{ static_cast<float>((worldLocationM - worldLocationBR).Length()) };
+		float radius{ static_cast<float>((worldLocationM - worldLocationTL).Length()) };
 		playerCameraInfo.Emplace(worldLocationM, abs(radius) + capsuleRadius);
 	}
 
+	playerCameraInfo.Sort([](TPair<FVector, float> _Lhs, TPair<FVector, float> _Rhs) {
+		return _Lhs.Key.SquaredLength() > _Rhs.Key.SquaredLength();
+		});
+
 	const float rangeMin{ -100.0f };
 	const float rangeMax{ 100.0f };
-	FVector randomDir{ FMath::FRandRange(rangeMin,rangeMax),FMath::FRandRange(rangeMin,rangeMax) ,0.0f };
+	FVector randomDir{ FMath::FRandRange(rangeMin, rangeMax),FMath::FRandRange(rangeMin, rangeMax) ,0.0f };
 	randomDir.Normalize();
 
 	FVector spawnLocation{};

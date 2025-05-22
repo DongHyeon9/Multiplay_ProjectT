@@ -21,15 +21,6 @@ AIG_PlayerController::AIG_PlayerController(const FObjectInitializer& _Initialize
 	if (MAIN_WIDGET.Succeeded()) mainWidgetClass = MAIN_WIDGET.Class;
 }
 
-void AIG_PlayerController::PreInitializeComponents()
-{
-	Super::PreInitializeComponents();
-
-	playerMappingContext = NewObject<UInputMappingContext>(this);
-	// TODO
-	// playerMappingContext 설정하는 로직
-}
-
 void AIG_PlayerController::InitPlayer(const FCharacterData& _NewData)
 {
 	auto character = GetPawn<AIGC_Player>();
@@ -102,51 +93,45 @@ void AIG_PlayerController::Client_EndEvent_Implementation()
 void AIG_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
 #if !WITH_EDITOR
 	if (GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
 	{
-#endif
 		SetInputMode(FInputModeGameOnly{});
 		SetShowMouseCursor(false);
 
-		if (UEnhancedInputLocalPlayerSubsystem* subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
-		{
-			subsystem->AddMappingContext(playerMappingContext, 0);
-		}
-#if !WITH_EDITOR
 		DisableInput(this);
-#endif
 
 		mainWidget = CreateWidget<UIGW_Main>(this, mainWidgetClass);
 		mainWidget->AddToViewport();
 		mainWidget->onFinishStartAnim.BindDynamic(this, &AIG_PlayerController::Server_OnFinishStartEvent);
 		mainWidget->onFinishEndAnim.BindDynamic(this, &AIG_PlayerController::PrintResult);
-#if !WITH_EDITOR
-	}
-#endif
-
-#if WITH_EDITOR
-	if (mainWidget && mainWidget->IsInViewport())
-	{
 		mainWidget->InitWidget();
 		mainWidget->InitTimer(GetWorld()->GetGameState<AIG_GameState>());
 	}
 #endif
-}
 
-void AIG_PlayerController::SetupInputComponent()
-{
-	Super::SetupInputComponent();
+#if WITH_EDITOR
+	SetInputMode(FInputModeGameOnly{});
+	SetShowMouseCursor(false);
+
+	mainWidget = CreateWidget<UIGW_Main>(this, mainWidgetClass);
+	mainWidget->AddToViewport();
+	mainWidget->onFinishStartAnim.BindDynamic(this, &AIG_PlayerController::Server_OnFinishStartEvent);
+	mainWidget->onFinishEndAnim.BindDynamic(this, &AIG_PlayerController::PrintResult);
+	mainWidget->InitWidget();
+	mainWidget->InitTimer(GetWorld()->GetGameState<AIG_GameState>());
+#endif
 }
 
 void AIG_PlayerController::PrintResult()
 {
-	// TODO
-	// 게임 종료시 처리해야될 로직
-	// 결과창 UI
 	auto gs = GetWorld()->GetGameState<AIG_GameState>();
 	for (auto ps : gs->PlayerArray) 
 	{
 		PRINTSTR(-1, 10.0f, FColor::Green, TEXT("%s : %.1f"), *ps->GetPlayerName(), ps->GetScore());
+		// TODO
+		// 게임 종료시 처리해야될 로직
+		// 결과창 UI
 	}
 }

@@ -35,10 +35,20 @@ void UILW_Main::NativeConstruct()
 	}
 }
 
+void UILW_Main::NativeDestruct()
+{
+	Super::NativeDestruct();
+
+	if (findSessionsComplete.IsValid())
+		sessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(findSessionsComplete), findSessionsComplete.Reset();
+}
+
 void UILW_Main::CreateModal(const FText& _GuideText, const FText& _ButtonText)
 {
 	if (modalWidget && modalWidget->IsInViewport()) modalWidget->RemoveFromParent();
-
+	// 모달 생성을 모듈화하고
+	// 로그를 출력함으로써 반복된 로그 출력 작업을 감소시킴
+	PTT_LOG(Warning, TEXT("%s"), *_GuideText.ToString());
 	modalWidget = CreateWidget<UILW_Modal>(GetOwningPlayer(), modalWidgetClass);
 	modalWidget->SetText(_GuideText, _ButtonText);
 	modalWidget->AddToViewport(1);
@@ -106,6 +116,7 @@ void UILW_Main::OnFindSessionsComplete(bool _bWasSuccessful)
 				FString connectURL{};
 				if (sessionInterface->GetResolvedConnectString(SESSION_NAME, connectURL))
 				{
+					PTT_LOG(Warning, TEXT("Client Travel"));
 					GetOwningPlayer()->ClientTravel(connectURL, TRAVEL_Absolute);
 					return;
 				}

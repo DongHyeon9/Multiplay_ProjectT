@@ -18,13 +18,14 @@ void AL_GameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 서버에서 세션을 생성한다
 	IOnlineSubsystem* subsystem{ IOnlineSubsystem::Get() };
 	IOnlineSessionPtr sessions{ subsystem ? subsystem->GetSessionInterface() : nullptr };
 
 	check(sessions.IsValid());
 
 	FOnlineSessionSettings settings{};
-	settings.NumPublicConnections = 5;
+	settings.NumPublicConnections = MAX_PLAYER_COUNT;
 	settings.bIsLANMatch = true;
 	settings.bShouldAdvertise = true;
 	settings.bAllowJoinInProgress = true;
@@ -35,6 +36,7 @@ void AL_GameMode::BeginPlay()
 
 void AL_GameMode::PreLogin(const FString& _Options, const FString& _Address, const FUniqueNetIdRepl& _UniqueId, FString& _ErrorMessage)
 {
+	//플레이어가 정원을 초과하면 입장을 거부하고 메세지를 보낸다
 	if (GetNumPlayers() >= MAX_PLAYER_COUNT)
 	{
 		_ErrorMessage = TEXT("Server is full");
@@ -56,11 +58,11 @@ void AL_GameMode::EndPlay(EEndPlayReason::Type _Reason)
 		check(sessions.IsValid());
 		sessions->DestroySession(SESSION_NAME);
 	}
-
 }
 
 void AL_GameMode::OnLoginComplete()
 {
+	//입장 플레이어가 채워지면 ServerTravel을 실행해 게임을 시작한다
 	if (MAX_PLAYER_COUNT == GetNumPlayers())
 	{
 		const FString mapURL = mainLevel.GetLongPackageName() + TEXT("?listen");
@@ -78,6 +80,7 @@ void AL_GameMode::OnLoginComplete()
 
 void AL_GameMode::OnCreateSessionComplete(FName _SessionName, bool _bWasSuccessful)
 {
+	// 세션 생성에 성공했는지 로그를 출력한다
 	if (_bWasSuccessful)
 	{
 		PTT_LOG(Warning, TEXT("Create Session Success : %s"), *_SessionName.ToString());

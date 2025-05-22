@@ -4,6 +4,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "InGame/Player/IGC_Player.h"
 #include "InGame/Enemy/IG_AIController.h"
+#include "Components/WidgetComponent.h"
 
 AIGC_Enemy::AIGC_Enemy(const FObjectInitializer& _Initializer)
 	: Super(_Initializer)
@@ -29,6 +30,17 @@ void AIGC_Enemy::BeginPlay()
 	GetStatComp()->onChangeState.AddUObject(this, &AIGC_Enemy::OnChangeState);
 	enemyCollision->OnComponentBeginOverlap.AddDynamic(this, &AIGC_Enemy::OnBeginOverlap);
 	enemyCollision->OnComponentEndOverlap.AddDynamic(this, &AIGC_Enemy::OnEndOverlap);
+}
+
+void AIGC_Enemy::EndPlay(EEndPlayReason::Type _Reason)
+{
+	Super::EndPlay(_Reason);
+
+	if (disableHandle.IsValid())
+		GetWorld()->GetTimerManager().ClearTimer(disableHandle), disableHandle.Invalidate();
+
+	if (damageHandle.IsValid())
+		FTSTicker::GetCoreTicker().RemoveTicker(damageHandle), damageHandle.Reset();
 }
 
 void AIGC_Enemy::InitEnemy()
@@ -67,10 +79,12 @@ void AIGC_Enemy::OnChangeState(E_CHARACTER_STATE _NewState)
 		break;
 	}
 	case E_CHARACTER_STATE::ENABLE: {
+		GetStatusWidget()->SetHiddenInGame(false);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	}
 	case E_CHARACTER_STATE::DEAD: {
+		GetStatusWidget()->SetHiddenInGame(true);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		if (disableHandle.IsValid())
 			disableHandle.Invalidate();

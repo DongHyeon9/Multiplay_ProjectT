@@ -28,6 +28,7 @@ void ULW_MatchWait::NativeConstruct()
 	connectStateList.Reserve(MAX_PLAYER_COUNT);
 	APlayerController* owner{ GetOwningPlayer() };
 
+	//최대 플레이어의 수 만큼 connectState위젯을 생성한다
 	for (int32 i = 0; i < MAX_PLAYER_COUNT; ++i)
 	{
 		USizeBox* sizeBox{ WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass()) };
@@ -51,17 +52,21 @@ void ULW_MatchWait::NativeConstruct()
 		FTickerDelegate::CreateUObject(this, &ULW_MatchWait::RefreshMatchState),
 		refreshInterval
 	);
+
+	PTT_LOG(Warning, TEXT("%s : Main Widget Init Success!"), *GetOwningPlayer()->GetName());
 }
 
 void ULW_MatchWait::RemoveFromParent()
 {
-	FTSTicker::GetCoreTicker().RemoveTicker(refreshHandle);
+	if (refreshHandle.IsValid())
+		FTSTicker::GetCoreTicker().RemoveTicker(refreshHandle), refreshHandle.Reset();
 
 	Super::RemoveFromParent();
 }
 
 bool ULW_MatchWait::RefreshMatchState(float _DeltaTime)
 {
+	//현재 플레이어들의 접속상태를 갱신한다
 	auto gs = GetWorld()->GetGameState<AGameState>();
 	for (int32 i = 0; i < connectStateList.Num(); ++i)
 	{
@@ -80,5 +85,6 @@ bool ULW_MatchWait::RefreshMatchState(float _DeltaTime)
 
 void ULW_MatchWait::OnClickedCancel()
 {
+	// 취소를 누를 시 원래 있던 레벨로 돌아간다
 	UGameplayStatics::OpenLevel(GetOwningPlayer(), TEXT("LV_Intro"));
 }
