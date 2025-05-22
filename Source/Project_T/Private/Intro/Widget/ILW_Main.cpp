@@ -10,6 +10,13 @@
 
 #define LOCTEXT_NAMESPACE "UILW_Main"
 
+UILW_Main::UILW_Main(const FObjectInitializer& _Initializer)
+	:Super(_Initializer)
+{
+	static ConstructorHelpers::FClassFinder<UUserWidget> MAIN_WIDGET(TEXT("/Game/01_Blueprint/Intro/Widget/WG_IL_Modal"));
+	if (MAIN_WIDGET.Succeeded())modalWidgetClass = MAIN_WIDGET.Class;
+}
+
 void UILW_Main::NativeConstruct()
 {
 	Super::NativeConstruct();

@@ -7,6 +7,11 @@
 AL_GameMode::AL_GameMode(const FObjectInitializer& _Initializer):Super(_Initializer)
 {
 	bUseSeamlessTravel = true;
+
+	static ConstructorHelpers::FClassFinder<APlayerController> PLAYER_CONTROLLER(TEXT("/Game/01_Blueprint/Lobby/BP_L_PlayerController"));
+	
+	mainLevel = TSoftObjectPtr<UWorld>(FSoftObjectPath(TEXT("/Game/05_Level/LV_Main.LV_Main")));
+	if (PLAYER_CONTROLLER.Succeeded()) PlayerControllerClass = PLAYER_CONTROLLER.Class;
 }
 
 void AL_GameMode::BeginPlay()

@@ -16,5 +16,6 @@ private:
 	FColor defaultColor{ FColor::White };
 
 public:
+	AIG_GameMode(const FObjectInitializer& _Initializer);
 	void OnCompleteAllPlayer();
 };

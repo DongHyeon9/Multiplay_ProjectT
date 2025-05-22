@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Project_T.h"
 #include "GameFramework/PlayerController.h"
@@ -18,6 +18,7 @@ private:
 	TObjectPtr<UILW_Main> mainWidget{};
 
 public:
+	AIL_PlayerController(const FObjectInitializer& _Initializer);
 	void BeginPlay()override;
 	
 };

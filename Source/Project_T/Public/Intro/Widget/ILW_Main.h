@@ -39,6 +39,7 @@ private:
 	FDelegateHandle findSessionsComplete{};
 
 public:
+	UILW_Main(const FObjectInitializer& _Initializer);
 	void NativeConstruct()override;
 
 private:

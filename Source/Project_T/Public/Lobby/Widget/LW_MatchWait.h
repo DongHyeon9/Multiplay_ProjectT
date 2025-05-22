@@ -37,6 +37,7 @@ private:
 	FTSTicker::FDelegateHandle refreshHandle{};
 
 public:
+	ULW_MatchWait(const FObjectInitializer& _Initializer);
 	void NativeConstruct()override;
 	void RemoveFromParent()override;
 	bool RefreshMatchState(float _DeltaTime);

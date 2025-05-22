@@ -16,14 +16,18 @@
 AIG_PlayerController::AIG_PlayerController(const FObjectInitializer& _Initializer):
 	Super(_Initializer)
 {
-	playerMappingContext = CreateDefaultSubobject<UInputMappingContext>(TEXT("PlayerMappingContext"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> MAIN_WIDGET(TEXT("/Game/01_Blueprint/InGame/Widget/WG_IGW_Main"));
+
+	if (MAIN_WIDGET.Succeeded()) mainWidgetClass = MAIN_WIDGET.Class;
 }
 
 void AIG_PlayerController::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
-	//playerMappingContext 설정하는 로직
+	playerMappingContext = NewObject<UInputMappingContext>(this);
+	// TODO
+	// playerMappingContext 설정하는 로직
 }
 
 void AIG_PlayerController::InitPlayer(const FCharacterData& _NewData)

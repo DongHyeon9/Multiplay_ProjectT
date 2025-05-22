@@ -1,8 +1,23 @@
 ﻿#include "InGame/IG_GameMode.h"
 #include "InGame/Player/IG_PlayerController.h"
 #include "GameFramework/PlayerState.h"
+#include "InGame/IG_GameState.h"
 
 static const FString START_PREFIX{ TEXT("PlayerStart_") };
+
+AIG_GameMode::AIG_GameMode(const FObjectInitializer& _Initializer)
+	:Super(_Initializer)
+{
+	static ConstructorHelpers::FClassFinder<APlayerState> PLAYER_STATE(TEXT("/Game/01_Blueprint/InGame/Player/BP_IG_PlayerState"));
+	static ConstructorHelpers::FClassFinder<APlayerController> PLAYER_CONTROLLER(TEXT("/Game/01_Blueprint/InGame/Player/BP_IG_PlayerController"));
+	static ConstructorHelpers::FClassFinder<AGameState> GAME_STATE(TEXT("/Game/01_Blueprint/InGame/BP_IG_GameState"));
+	static ConstructorHelpers::FClassFinder<APawn> PAWN(TEXT("/Game/01_Blueprint/InGame/Player/BP_IGC_Player"));
+
+	if (PLAYER_STATE.Succeeded()) PlayerStateClass = PLAYER_STATE.Class;
+	if (PLAYER_CONTROLLER.Succeeded()) PlayerControllerClass = PLAYER_CONTROLLER.Class;
+	if (GAME_STATE.Succeeded()) GameStateClass = GAME_STATE.Class;
+	if (PAWN.Succeeded()) DefaultPawnClass = PAWN.Class;
+}
 
 void AIG_GameMode::OnCompleteAllPlayer()
 {

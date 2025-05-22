@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Project_T.h"
 #include "GameFramework/GameMode.h"
@@ -9,4 +9,6 @@ class PROJECT_T_API AIL_GameMode : public AGameMode
 {
 	GENERATED_BODY()
 	
+public:
+	AIL_GameMode(const FObjectInitializer& _Initializer);
 };

@@ -1,8 +1,9 @@
 ﻿#pragma once
 
+#include <atomic>
+
 #include "../Project_T.h"
 #include "GameFramework/GameState.h"
-#include <atomic>
 #include "Containers/Ticker.h"
 #include "IG_GameState.generated.h"
 
@@ -49,6 +50,7 @@ private:
 	float curveLength{};
 
 public:
+	AIG_GameState(const FObjectInitializer& _Initializer);
 	void BeginPlay()override;
 	AIGC_Enemy* GetEnemyInPool();
 

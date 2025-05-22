@@ -12,6 +12,14 @@
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/GameState.h"
 
+ULW_MatchWait::ULW_MatchWait(const FObjectInitializer& _Initializer)
+	:Super(_Initializer)
+{
+	static ConstructorHelpers::FClassFinder<UUserWidget> CONNECT_STATE_WIDGET(TEXT("/Game/01_Blueprint/Lobby/Widget/WG_L_ConnectState"));
+
+	if (CONNECT_STATE_WIDGET.Succeeded())connectStateClass = CONNECT_STATE_WIDGET.Class;
+}
+
 void ULW_MatchWait::NativeConstruct()
 {
 	Super::NativeConstruct();
