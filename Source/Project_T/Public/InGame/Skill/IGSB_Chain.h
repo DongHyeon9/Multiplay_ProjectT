@@ -18,9 +18,8 @@ public:
 	float chainDistance{ 500.f };
 
 public:
+	void BeginPlay() override;
 	virtual void InitSkill();
 	void UseSkill() override;
-	
-	AIGC_Enemy* FindTarget(AIGC_Enemy* _Enemy,const TArray<AIGC_Enemy*>& _ExceptionEnemys);
 
 };

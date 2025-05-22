@@ -2,13 +2,19 @@
 #include "InGame/Enemy/IGC_Enemy.h"
 #include "Kismet/GameplayStatics.h"
 
-void AIGSB_Chain::InitSkill()
+void AIGSB_Chain::BeginPlay()
 {
+	this->SetOwner(GetOwner());
 	skillName = TEXT("Chain");
 	level = 1;
+	damage = 12.f;
 	duration = 0.5f;
 	coolDown = 5.f;
 	PTT_LOG(Warning, TEXT("skillName : %s\nlevel : %d\nduration : %0.1f\ncoolDown : %0.1f"), *skillName.ToString(), level, duration, coolDown);
+}
+
+void AIGSB_Chain::InitSkill()
+{
 	Super::InitSkill();
 }
 
@@ -21,8 +27,9 @@ void AIGSB_Chain::UseSkill()
 
 	for (int i = 0; i < maxChain && IsValid(CurrentTarget); ++i)
 	{
-
-		UGameplayStatics::ApplyDamage(CurrentTarget, damage, GetOwner()->GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
+		
+		//UGameplayStatics::ApplyDamage(CurrentTarget, damage, GetOwner()->GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
+		CurrentTarget->TakeDamage(damage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
 		PTT_LOG(Warning, TEXT("Target : %s"), *CurrentTarget->GetName());
 		Targets.Add(CurrentTarget);
 

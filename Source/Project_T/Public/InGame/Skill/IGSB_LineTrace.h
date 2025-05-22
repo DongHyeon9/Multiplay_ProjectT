@@ -9,6 +9,7 @@ class PROJECT_T_API AIGSB_LineTrace : public AIG_SkillBase
 {
 	GENERATED_BODY()
 public:
+	void BeginPlay() override;
 	virtual void InitSkill();
 	void UseSkill() override;
 	

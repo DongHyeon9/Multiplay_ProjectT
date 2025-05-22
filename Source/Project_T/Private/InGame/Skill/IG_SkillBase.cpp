@@ -1,11 +1,16 @@
 ﻿#include "InGame/Skill/IG_SkillBase.h"
 #include "Net/UnrealNetwork.h"
 
+void AIG_SkillBase::BeginPlay()
+{
+	Super::BeginPlay();
+	SetReplicates(true);
+}
+
 void AIG_SkillBase::InitSkill()
 {
 	bUseSkill = true;
 	coolDownHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_SkillBase::SkillInterval), coolDown);
-	
 	
 }
 
@@ -26,4 +31,16 @@ void AIG_SkillBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AIG_SkillBase, bUseSkill);
+}
+
+void AIG_SkillBase::ActivateSkill(UStaticMeshComponent* _Mesh)
+{
+	_Mesh->SetHiddenInGame(false);
+	_Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+void AIG_SkillBase::DisableSkill(UStaticMeshComponent* _Mesh)
+{
+	_Mesh->SetHiddenInGame(true);
+	_Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
