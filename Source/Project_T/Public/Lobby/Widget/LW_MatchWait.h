@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include "Lobby/Widget/L_UserWidget.h"
+#include "../Project_T.h"
+#include "Blueprint/UserWidget.h"
 #include "Containers/Ticker.h"
 #include "LW_MatchWait.generated.h"
 
@@ -10,7 +11,7 @@ class ULW_ConnectState;
 class AL_PlayerController;
 
 UCLASS()
-class PROJECT_T_API ULW_MatchWait : public UL_UserWidget
+class PROJECT_T_API ULW_MatchWait : public UUserWidget
 {
 	GENERATED_BODY()
 	

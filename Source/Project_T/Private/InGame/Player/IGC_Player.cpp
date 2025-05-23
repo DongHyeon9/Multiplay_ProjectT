@@ -9,9 +9,11 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
-#include "T_GameInstance.h"
 #include "Components/WidgetComponent.h"
 #include "InGame/Player/IG_PlayerController.h"
+#include "T_GameInstance.h"
+
+#include "Kismet/KismetSystemLibrary.h"
 
 AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	Super(_Intializer)
@@ -55,23 +57,15 @@ void AIGC_Player::BeginPlay()
 
 	GetStatusWidget()->SetHiddenInGame(true);
 
-#if WITH_EDITOR
 	if (APlayerController* playerController = Cast<APlayerController>(Controller))
 		if (UEnhancedInputLocalPlayerSubsystem* subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerController->GetLocalPlayer()))
 			subsystem->AddMappingContext(characterMappingContext, 0);
-#endif
 
 #if !WITH_EDITOR
-	if (GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
-	{
-		if (APlayerController* playerController = Cast<APlayerController>(Controller))
-			if (UEnhancedInputLocalPlayerSubsystem* subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerController->GetLocalPlayer()))
-				subsystem->AddMappingContext(characterMappingContext, 0);
-		FString userName{ GetGameInstance<UT_GameInstance>()->GetUserName() };
-
-		if (auto pc = Cast<AIG_PlayerController>(GetController()))
-			pc->Server_InitPlayer(userName);
-	}
+	//서버에 입장완료를 알린다
+	if (HasAuthority()) return;
+	if (auto pc = GetController<AIG_PlayerController>())
+		pc->Server_InitPlayer(GetGameInstance<UT_GameInstance>()->GetUserName());
 #endif
 }
 
@@ -79,6 +73,7 @@ void AIGC_Player::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
+	//플레이어 입력을 설정해준다
 	characterMappingContext = NewObject<UInputMappingContext>(this);
 	moveAction = NewObject<UInputAction>(this);
 	moveAction->ValueType = EInputActionValueType::Axis2D;

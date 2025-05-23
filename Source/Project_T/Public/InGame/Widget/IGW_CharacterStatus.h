@@ -1,13 +1,14 @@
 ﻿#pragma once
 
-#include "InGame/Widget/IG_UserWidget.h"
+#include "../Project_T.h"
+#include "Blueprint/UserWidget.h"
 #include "IGW_CharacterStatus.generated.h"
 
 class UTextBlock;
 class UProgressBar;
 
 UCLASS()
-class PROJECT_T_API UIGW_CharacterStatus : public UIG_UserWidget
+class PROJECT_T_API UIGW_CharacterStatus : public UUserWidget
 {
 	GENERATED_BODY()
 private:

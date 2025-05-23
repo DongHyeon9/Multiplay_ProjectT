@@ -13,4 +13,9 @@ struct FCharacterData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "FCharacterData")
 	FColor characterColor{};
+
+	FString ToString()const
+	{
+		return FString::Printf(TEXT("%s : %s"), *characterName, *characterColor.ToString());
+	}
 };

@@ -1,13 +1,14 @@
 ﻿#pragma once
 
-#include "Intro/Widget/IL_UserWidget.h"
+#include "../Project_T.h"
+#include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "ILW_Modal.generated.h"
 
 class UTextBlock;
 
 UCLASS()
-class PROJECT_T_API UILW_Modal : public UIL_UserWidget
+class PROJECT_T_API UILW_Modal : public UUserWidget
 {
 	GENERATED_BODY()
 public:

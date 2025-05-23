@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include "InGame/Widget/IG_UserWidget.h"
+#include "../Project_T.h"
+#include "Blueprint/UserWidget.h"
 #include "IGW_Main.generated.h"
 
 class UWidgetAnimation;
@@ -8,7 +9,7 @@ class AIG_GameState;
 class UTextBlock;
 
 UCLASS()
-class PROJECT_T_API UIGW_Main : public UIG_UserWidget
+class PROJECT_T_API UIGW_Main : public UUserWidget
 {
 	GENERATED_BODY()
 public:

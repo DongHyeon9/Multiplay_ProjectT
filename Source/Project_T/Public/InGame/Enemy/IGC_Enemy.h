@@ -55,6 +55,7 @@ public:
 private:
 	void OnChangeState(E_CHARACTER_STATE _NewState);
 	void OnDelay_ChangeDisable();
+	void MoveToNearestPlayer();
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* _OverlappedComponent, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, int32 _OtherBodyIndex, bool _bFromSweep, const FHitResult& _SweepResult);

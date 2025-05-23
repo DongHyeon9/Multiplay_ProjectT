@@ -1,13 +1,14 @@
 ﻿#pragma once
 
-#include "Lobby/Widget/L_UserWidget.h"
+#include "../Project_T.h"
+#include "Blueprint/UserWidget.h"
 #include "LW_ConnectState.generated.h"
 
 class UImage;
 class UTextBlock;
 
 UCLASS()
-class PROJECT_T_API ULW_ConnectState : public UL_UserWidget
+class PROJECT_T_API ULW_ConnectState : public UUserWidget
 {
 	GENERATED_BODY()
 private:

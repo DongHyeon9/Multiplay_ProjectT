@@ -35,6 +35,7 @@ AIG_CharacterBase::AIG_CharacterBase(const FObjectInitializer& _Intializer)
 
 void AIG_CharacterBase::SetCharacterData(const FCharacterData& _NewData)
 {
+	PTT_LOG(Warning, TEXT("%s"), *_NewData.ToString());
 	characterData = _NewData;
 }
 
@@ -51,6 +52,7 @@ void AIG_CharacterBase::BeginPlay()
 
 	if (!HasAuthority())
 	{
+		// 다이나믹 머티리얼을 생성한다
 		int32 materialCount{ GetMesh()->GetMaterials().Num() };
 		for (int32 i = 0; i < materialCount; ++i)
 		{
@@ -65,6 +67,7 @@ void AIG_CharacterBase::BeginPlay()
 
 void AIG_CharacterBase::OnRep_UpdateCharacterData()
 {
+	//서버에서 캐릭터의 정보가 변경되면 클라이언트에서 업데이트한다
 	if (characterData.characterName.StartsWith(PLAYER_NAME_PREFIX, ESearchCase::CaseSensitive))
 		characterData.characterName = characterData.characterName.RightChop(PLAYER_NAME_PREFIX.Len());
 

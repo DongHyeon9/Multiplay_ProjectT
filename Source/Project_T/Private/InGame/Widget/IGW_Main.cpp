@@ -29,6 +29,7 @@ void UIGW_Main::NativeTick(const FGeometry& _MyGeometry, float _InDeltaTime)
 {
 	Super::NativeTick(_MyGeometry, _InDeltaTime);
 
+	//시간을 갱신한다
 	if (gameState)
 	{
 		txt_CurrentTime->SetText(FText::FromString(FString::Printf(TEXT("남은 시간 : %d"), gameState->GetTimer())));

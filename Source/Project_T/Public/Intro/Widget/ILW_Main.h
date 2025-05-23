@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include "Intro/Widget/IL_UserWidget.h"
+#include "../Project_T.h"
+#include "Blueprint/UserWidget.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "OnlineSubsystem.h"
 #include "ILW_Main.generated.h"
@@ -10,7 +11,7 @@ class UEditableText;
 class UILW_Modal;
 
 UCLASS()
-class PROJECT_T_API UILW_Main : public UIL_UserWidget
+class PROJECT_T_API UILW_Main : public UUserWidget
 {
 	GENERATED_BODY()
 private:

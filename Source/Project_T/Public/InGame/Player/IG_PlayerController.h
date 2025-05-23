@@ -21,6 +21,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIG_PlayerController", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UIGW_Main> mainWidget{};
 
+	TPair<FVector, float> screenInfo{};
+
 public:
 	AIG_PlayerController(const FObjectInitializer& _Initializer);
 	// 플레이어의 초기화를 진행
@@ -32,6 +34,10 @@ public:
 	void Server_InitPlayer(const FString& _NewName);
 	void Server_InitPlayer_Implementation(const FString& _NewName);
 	bool Server_InitPlayer_Validate(const FString& _NewName);
+
+	UFUNCTION(Server, Unreliable)
+	void Server_SendScreenInfo(const FVector& _Center, const float _Radius);
+	void Server_SendScreenInfo_Implementation(const FVector& _Center, const float _Radius);
 
 	// 서버에 시작 위젯 이벤트가 끝났다고 알림(게임 시간 동기화)
 	UFUNCTION(Server, Reliable)
@@ -53,8 +59,11 @@ public:
 	void Client_EndEvent();
 	void Client_EndEvent_Implementation();
 
+	FORCEINLINE const TPair<FVector, float>& GetScreenInfo()const { return screenInfo; }
+
 protected:
 	void BeginPlay()override;
+	void Tick(float _DeltaTime)override;
 
 private:
 	UFUNCTION()

@@ -5,8 +5,7 @@
 #include "InGame/Enemy/IGC_Enemy.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/CapsuleComponent.h"
-
-#include "DrawDebugHelpers.h"
+#include "EngineUtils.h"
 
 AIG_GameState::AIG_GameState(const FObjectInitializer& _Initializer)
 	:Super(_Initializer)
@@ -21,9 +20,10 @@ AIG_GameState::AIG_GameState(const FObjectInitializer& _Initializer)
 void AIG_GameState::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (HasAuthority())
 	{
+		//서버에서 풀사이즈만큼 오브젝트를 생성한다
 		for (int32 i = 0; i < objectPoolDefaultSize; ++i)
 		{
 			PTT_LOG(Warning, TEXT("Spawn : %d"), i + 1);
@@ -32,8 +32,9 @@ void AIG_GameState::BeginPlay()
 		}
 	}
 
+	//에디터에서 실행시 디버깅을 위해 게임을 바로 시작한다
 #if WITH_EDITOR
-	StartGame();
+		StartGame();
 #endif
 }
 
@@ -48,9 +49,11 @@ void AIG_GameState::EndPlay(EEndPlayReason::Type _Reason)
 
 AIGC_Enemy* AIG_GameState::GetEnemyInPool()
 {
+	//풀이 비어있으면 확장한다
 	if (enemyPool.IsEmpty())
 		ExpandPool();
 
+	//풀에서 적을 가져와 생성한다
 	AIGC_Enemy* monster{};
 	enemyPool.Dequeue(monster);
 	return monster;
@@ -58,10 +61,13 @@ AIGC_Enemy* AIG_GameState::GetEnemyInPool()
 
 AIGC_Enemy* AIG_GameState::SpawnEnemy()
 {
+	//적을 스폰하고 초기화를 진행
 	FTransform spawnTransform{};
-	AIGC_Enemy* result{ GetWorld()->SpawnActorDeferred<AIGC_Enemy>(enemyClass, spawnTransform, this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn) };
+	FActorSpawnParameters param{};
+
+	param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AIGC_Enemy* result{ GetWorld()->SpawnActor<AIGC_Enemy>(enemyClass, spawnTransform, param) };
 	result->InitEnemy();
-	result->FinishSpawning(spawnTransform);
 	result->onEnemyState.BindUObject(this, &AIG_GameState::OnEnemyStateChange);
 
 	return result;
@@ -69,6 +75,8 @@ AIGC_Enemy* AIG_GameState::SpawnEnemy()
 
 void AIG_GameState::OnInitPlayer()
 {
+	//시간 동기화를 위해
+	//입장한 플레이들이 준비됐는지 확인한다
 	++compeletedPlayer;
 	PTT_LOG(Warning, TEXT("compeletedPlayer : %d"), compeletedPlayer.load());
 	if (compeletedPlayer != MAX_PLAYER_COUNT) return;
@@ -83,6 +91,7 @@ void AIG_GameState::OnInitPlayer()
 	{
 		if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
 		{
+			//모든 플레이어가 입장했으면 시작 이벤트를 진행한다
 			pc->Client_StartEvent();
 		}
 	}
@@ -90,6 +99,8 @@ void AIG_GameState::OnInitPlayer()
 
 void AIG_GameState::RequestStartGame()
 {
+	// 모든 플레이어가 시작 이벤트가 끝났으면
+	// 동기화 후 게임을 시작한다
 	++compeletedPlayer;
 	PTT_LOG(Warning, TEXT("compeletedPlayer : %d"), compeletedPlayer.load());
 	if (compeletedPlayer == MAX_PLAYER_COUNT)
@@ -146,23 +157,32 @@ void AIG_GameState::StartGame()
 			pc->Client_StartGame();
 		}
 	}
+
+	//커브의 길이를 저장한다
 	float curveMinValue{};
 	float curveMaxValue{};
 	difficultyCurve->GetValueRange(curveMinValue, curveMaxValue);
 	curveLength = curveMaxValue - curveMinValue;
+
+	//타이머 측정과 스폰을 시작한다
+	//타이머는 최적화를 위해 1초에 한번씩 실행한다
 	gameTimerHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::GameTimer), 1.0f);
 	spawnHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &AIG_GameState::EnemySpawn), spawnInterval);
+
+	PTT_LOG(Warning, TEXT("Game Start!"));
 }
 
 void AIG_GameState::EndGame()
 {
-	while (!enemyPool.IsEmpty())
+	//게임 시간이 끝났으면 모든 적을 제거한다
+	TActorRange<AIGC_Enemy> enemies(GetWorld());
+	for (auto enemy : enemies)
 	{
-		AIGC_Enemy* monster{};
-		enemyPool.Dequeue(monster);
-		monster->Destroy();
+		enemy->Destroy();
 	}
+	enemyPool.Empty();
 
+	//종료 이벤트를 실행한다
 	for (auto pIter = GetWorld()->GetPlayerControllerIterator(); pIter; ++pIter)
 	{
 		if (auto pc = Cast<AIG_PlayerController>(pIter->Get()))
@@ -170,11 +190,15 @@ void AIG_GameState::EndGame()
 			pc->Client_EndEvent();
 		}
 	}
+
+	PTT_LOG(Warning, TEXT("Game End!"));
 }
 
 void AIG_GameState::ExpandPool()
 {
-	int32 newSize{ static_cast<int32>(objectPoolDefaultSize * 1.5) };
+	//일정 배율만큼 풀사이즈를 늘려준다
+	int32 newSize{ static_cast<int32>(objectPoolDefaultSize * expansionRatio) };
+	PTT_LOG(Warning, TEXT("New Pool Size : %d"), newSize);
 	for (int32 i = objectPoolDefaultSize; i < newSize; ++i)
 	{
 		auto enemy{ SpawnEnemy() };
@@ -188,52 +212,25 @@ void AIG_GameState::ActiveEnemy(AIGC_Enemy* _Enemy)
 	TArray<TPair<FVector, float>> playerCameraInfo{};
 	playerCameraInfo.Reserve(world->GetNumPlayerControllers());
 	const float capsuleRadius{ _Enemy->GetCapsuleComponent()->GetScaledCapsuleRadius() };
+	FHitResult outResult{};
+
 	for (auto pIter = world->GetPlayerControllerIterator(); pIter; ++pIter)
 	{
 		auto pc = Cast<AIG_PlayerController>(pIter->Get());
 		if (!pc) continue;
-		const float traceDistance{ 10000.0f };
 
-		int32 sizeX{}, sizeY{};
-		pc->GetViewportSize(sizeX, sizeY);
-
-		//중앙 스크린의 월드좌표 구하기
-		FVector worldLocationM{}, worldDirectionM{};
-		pc->DeprojectScreenPositionToWorld(sizeX * 0.5, sizeY * 0.5, worldLocationM, worldDirectionM);
-		FVector targetLocation{ worldDirectionM * traceDistance + worldLocationM };
-		FHitResult outResult{};
-		FCollisionObjectQueryParams param{};
-		if (world->LineTraceSingleByObjectType(
-			outResult,
-			worldLocationM,
-			targetLocation,
-			UEngineTypes::ConvertToObjectType(ECC_WorldStatic)))
-		{
-			worldLocationM = outResult.ImpactPoint;
-		}
-
-		//좌측 상단 스크린의 월드좌표 구하기
-		FVector worldLocationTL{}, worldDirectionTL{};
-		pc->DeprojectScreenPositionToWorld(0, 0, worldLocationTL, worldDirectionTL);
-		targetLocation = worldDirectionTL * traceDistance + worldLocationTL;
-		if (world->LineTraceSingleByObjectType(
-			outResult,
-			worldLocationTL,
-			targetLocation,
-			UEngineTypes::ConvertToObjectType(ECC_WorldStatic)))
-		{
-			worldLocationTL = outResult.ImpactPoint;
-		}
-		
-		//현재 스크린을 완전히 덮는 구의 반지름 구하기
-		float radius{ static_cast<float>((worldLocationM - worldLocationTL).Length()) };
-		playerCameraInfo.Emplace(worldLocationM, abs(radius) + capsuleRadius);
+		TPair<FVector, float> screenInfo{ pc->GetScreenInfo() };
+		screenInfo.Value += capsuleRadius;
+		PTT_LOG(Warning, TEXT("%s Info : %s / %.4f"), *pc->GetName(), *screenInfo.Key.ToString(), screenInfo.Value);
+		playerCameraInfo.Emplace(screenInfo);
 	}
 
+	//영점으로부터 가까운 순서대로 정렬
 	playerCameraInfo.Sort([](TPair<FVector, float> _Lhs, TPair<FVector, float> _Rhs) {
 		return _Lhs.Key.SquaredLength() > _Rhs.Key.SquaredLength();
 		});
 
+	//랜덤한 방향을 결정
 	const float rangeMin{ -100.0f };
 	const float rangeMax{ 100.0f };
 	FVector randomDir{ FMath::FRandRange(rangeMin, rangeMax),FMath::FRandRange(rangeMin, rangeMax) ,0.0f };
@@ -255,8 +252,23 @@ void AIG_GameState::ActiveEnemy(AIGC_Enemy* _Enemy)
 		} while (distance < cameraInfo.Value);
 	}
 
+	//소환될 Z값을 조정한다
+	FVector startLoc{ spawnLocation };
+	startLoc.Z -= 100.0f;
+	FVector endLoc{ spawnLocation };
+	endLoc.Z += 100.0f;
+	if (world->LineTraceSingleByObjectType(
+		outResult, 
+		startLoc, 
+		endLoc, 
+		UEngineTypes::ConvertToObjectType(ECC_WorldStatic)))
+	{
+		spawnLocation = outResult.ImpactPoint;
+	}
 	spawnLocation.Z += _Enemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
 	_Enemy->SetActorLocation(spawnLocation);
+	PTT_LOG(Warning, TEXT("Enemy Location : %s"), *spawnLocation.ToString());
 	_Enemy->SetActive(true);
 }
 

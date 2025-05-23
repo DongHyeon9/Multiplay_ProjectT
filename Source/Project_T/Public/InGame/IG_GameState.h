@@ -47,6 +47,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameState Enemy Pool", meta = (AllowPrivateAccess = true))
 	int32 objectPoolDefaultSize{ 100 };
 
+	//풀의 확장 비율
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameState Enemy Pool", meta = (AllowPrivateAccess = true))
+	float expansionRatio{ 1.5f };
+
 	// 게임의 난이도를 시간에 따라 정하는 커브
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_GameState Enemy Pool", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UCurveFloat> difficultyCurve{};
