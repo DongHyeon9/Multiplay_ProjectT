@@ -49,17 +49,15 @@ void AIG_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetLocalRole() != ENetRole::ROLE_Authority)
+	if (!HasAuthority())
 	{
 		int32 materialCount{ GetMesh()->GetMaterials().Num() };
 		for (int32 i = 0; i < materialCount; ++i)
 		{
 			CREATE_DYNAMIC_MATERIAL(i);
 		}
-#if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
-		RootComponent->SetHiddenInGame(false);
-#endif
 	}
+
 #if WITH_EDITOR
 	RootComponent->SetHiddenInGame(false);
 #endif
