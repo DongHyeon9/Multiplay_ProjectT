@@ -27,7 +27,7 @@ protected:
 	float damage{ 20.f };
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_SkillBase")
-	float duration{1.f};
+	uint8 duration{ 1 };
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "AIG_SkillBase")
 	float coolDown{3.f};

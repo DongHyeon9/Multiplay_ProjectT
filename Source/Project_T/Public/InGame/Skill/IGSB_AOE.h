@@ -16,13 +16,21 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIGSB_AOE", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UStaticMeshComponent> skillMesh{};
 
+	uint8 currentDuration;
+
+	FTSTicker::FDelegateHandle durationHandle{};
+
 public:
 	AIGSB_AOE();
 
 	void BeginPlay() override;
-	virtual void InitSkill();
 	void UseSkill() override;
-	
-	void DamageoverTime();
-	
+	virtual void InitSkill();
+	virtual void Tick(float _DeltaTime) override;
+
+private:
+	UFUNCTION()
+	void OnStartOverlap(UPrimitiveComponent* _OverlappedComponent, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, int32 _OtherBodyIndex, bool _bFromSweep, const FHitResult& _SweepResult);
+
+	bool DamageoverTime(float _DeltaTime);
 };
