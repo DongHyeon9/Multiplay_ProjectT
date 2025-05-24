@@ -27,7 +27,7 @@ public:
 	AIG_PlayerController(const FObjectInitializer& _Initializer);
 	// 플레이어의 초기화를 진행
 	// @param _NewData 플레이어의 데이터
-	void InitPlayer(const FCharacterData& _NewData);
+	void InitPlayer(const FPlayerData& _NewData);
 	// 서버에 플레이어의 초기화를 요청
 	// @param _NewName 현재 접속한 플레이어의 이름
 	UFUNCTION(Server, Reliable, WithValidation)

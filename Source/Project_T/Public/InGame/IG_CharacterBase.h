@@ -24,7 +24,7 @@ private:
 private:
 	//캐릭터의 정보를 담는 구조체
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_UpdateCharacterData, VisibleAnywhere, BlueprintReadOnly, category = "AIG_CharacterBase", meta = (AllowPrivateAccess = true))
-	FCharacterData characterData{};
+	FPlayerData characterData{};
 
 public:
 	AIG_CharacterBase(const FObjectInitializer& _Intializer);
@@ -35,10 +35,10 @@ public:
 	// 캐릭터의 상태 위젯을 가져온다
 	FORCEINLINE TObjectPtr<UWidgetComponent> GetStatusWidget()const { return statusWidget; }
 	// 캐릭터의 정보를 가져온다
-	FORCEINLINE const FCharacterData& GetCharacterData()const { return characterData; }
+	FORCEINLINE const FPlayerData& GetCharacterData()const { return characterData; }
 	// 캐릭터의 정보를 설정한다
 	// @param _NewData 설정할 데이터
-	virtual void SetCharacterData(const FCharacterData& _NewData);
+	virtual void SetCharacterData(const FPlayerData& _NewData);
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:

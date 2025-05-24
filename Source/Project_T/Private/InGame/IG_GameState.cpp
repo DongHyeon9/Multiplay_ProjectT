@@ -204,6 +204,8 @@ void AIG_GameState::ExpandPool()
 		auto enemy{ SpawnEnemy() };
 		enemyPool.Enqueue(enemy);
 	}
+
+	objectPoolDefaultSize = newSize;
 }
 
 void AIG_GameState::ActiveEnemy(AIGC_Enemy* _Enemy)
@@ -269,7 +271,7 @@ void AIG_GameState::ActiveEnemy(AIGC_Enemy* _Enemy)
 
 	_Enemy->SetActorLocation(spawnLocation);
 	PTT_LOG(Warning, TEXT("Enemy Location : %s"), *spawnLocation.ToString());
-	_Enemy->SetActive(true);
+	_Enemy->Multicast_SetActive(true);
 }
 
 void AIG_GameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

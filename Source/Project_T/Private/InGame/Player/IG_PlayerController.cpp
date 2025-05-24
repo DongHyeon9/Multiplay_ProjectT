@@ -23,7 +23,7 @@ AIG_PlayerController::AIG_PlayerController(const FObjectInitializer& _Initialize
 	if (MAIN_WIDGET.Succeeded()) mainWidgetClass = MAIN_WIDGET.Class;
 }
 
-void AIG_PlayerController::InitPlayer(const FCharacterData& _NewData)
+void AIG_PlayerController::InitPlayer(const FPlayerData& _NewData)
 {
 	//캐릭터의 데이터를 초기화한다
 	auto character = GetPawn<AIGC_Player>();
@@ -71,12 +71,12 @@ void AIG_PlayerController::Client_StartGame_Implementation()
 {
 	//플레이어의 입력을 활성화 시킨다
 	EnableInput(this);
-	TActorRange<AIG_CharacterBase> characters(GetWorld());
-	for (auto character : characters)
+	TActorRange<AIGC_Player> players(GetWorld());
+	for (auto player : players)
 	{
-		//내 캐릭터 외에 다른 캐릭터들의 체력바를 보여준다
-		if (character != GetPawn())
-			character->GetStatusWidget()->SetHiddenInGame(false);
+		//내 캐릭터 외에 다른 플레이어의 체력바를 보여준다
+		if (player != GetPawn())
+			player->GetStatusWidget()->SetHiddenInGame(false);
 	}
 	//타이머를 활성화한다
 	if (mainWidget && mainWidget->IsInViewport())

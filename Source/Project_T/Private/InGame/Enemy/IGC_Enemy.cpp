@@ -5,7 +5,6 @@
 #include "InGame/Player/IGC_Player.h"
 #include "Components/WidgetComponent.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "InGame/Enemy/IG_EnemyMovement.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include <limits>
@@ -13,16 +12,19 @@
 AIGC_Enemy::AIGC_Enemy(const FObjectInitializer& _Initializer)
 	: Super(_Initializer)
 {
-	GetCharacterMovement()->DestroyComponent();
+	GetCharacterMovement()->bAutoActivate = false;
+
+	bReplicates = true;
+	SetReplicateMovement(true);
 
 	enemyMovementComp = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("EnemyMovementComp"));
+	enemyMovementComp->MaxSpeed = 400.0f;
 
 	GetMesh()->bHiddenInGame = true;
-	GetStatusWidget()->SetVisibility(false);
 
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Enemy"));
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	AutoPossessAI = EAutoPossessAI::Disabled;
+	AutoPossessAI = EAutoPossessAI::Spawned;
 
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MI_ENEMY_01(TEXT("/Game/03_Material/Instances/Manny/MI_Enemy_01"));
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MI_ENEMY_02(TEXT("/Game/03_Material/Instances/Manny/MI_Enemy_02"));
@@ -36,9 +38,10 @@ void AIGC_Enemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetCharacterMovement()->DestroyComponent();
 	UCapsuleComponent* enemyCollision{ GetCapsuleComponent() };
 
-	GetStatComp()->onChangeState.AddUObject(this, &AIGC_Enemy::OnChangeState);
+	GetStatComp()->onChangeState.AddUObject(this, &AIGC_Enemy::Multicast_OnChangeState);
 	enemyCollision->OnComponentBeginOverlap.AddDynamic(this, &AIGC_Enemy::OnBeginOverlap);
 	enemyCollision->OnComponentEndOverlap.AddDynamic(this, &AIGC_Enemy::OnEndOverlap);
 }
@@ -57,14 +60,16 @@ void AIGC_Enemy::EndPlay(EEndPlayReason::Type _Reason)
 void AIGC_Enemy::InitEnemy()
 {
 	//초기 상태를 비활성화 상태로 만든다
+	SetNetDormancy(ENetDormancy::DORM_DormantAll);
 	GetStatComp()->SetCharacterState(E_CHARACTER_STATE::DISABLE);
 }
 
-void AIGC_Enemy::SetActive(bool _bIsActive)
+void AIGC_Enemy::Multicast_SetActive_Implementation(bool _bIsActive)
 {
-	//적을 활성화 시킨다
-	SetReplicateMovement(_bIsActive);
-	SetReplicates(_bIsActive);
+	//적을 활성상태를 결정한다
+	if (HasAuthority())
+		SetNetDormancy(_bIsActive ? ENetDormancy::DORM_Awake : ENetDormancy::DORM_DormantAll);
+
 	GetMesh()->SetHiddenInGame(!_bIsActive);
 	if (_bIsActive)
 		GetStatComp()->SetCharacterState(E_CHARACTER_STATE::ENABLE);
@@ -100,24 +105,28 @@ void AIGC_Enemy::Tick(float _DeltaTime)
 	SetActorRotation(prevDir.Rotation());
 }
 
-void AIGC_Enemy::OnChangeState(E_CHARACTER_STATE _NewState)
+UPawnMovementComponent* AIGC_Enemy::GetMovementComponent() const
+{
+	return enemyMovementComp;
+}
+
+void AIGC_Enemy::Multicast_OnChangeState_Implementation(E_CHARACTER_STATE _NewState)
 {
 	switch (_NewState)
 	{
 	case E_CHARACTER_STATE::DISABLE: {
-		SetActive(false);
+		Multicast_SetActive(false);
 		break;
 	}
 	case E_CHARACTER_STATE::ENABLE: {
 		// 적의 상태를 활성화 시킨다
-		GetStatusWidget()->SetVisibility(true);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		SetTarget();
 		break;
 	}
 	case E_CHARACTER_STATE::DEAD: {
 		RemoveTarget();
-		GetStatusWidget()->SetVisibility(false);
+		GetStatusWidget()->SetHiddenInGame(true);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		// 일정 시간 후에 적을 비활성화 시킨다
 		if (disableHandle.IsValid()) GetWorld()->GetTimerManager().ClearTimer(disableHandle), disableHandle.Invalidate();

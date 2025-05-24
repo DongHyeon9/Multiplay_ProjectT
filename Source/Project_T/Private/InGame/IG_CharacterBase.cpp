@@ -8,7 +8,7 @@
 
 #define CREATE_DYNAMIC_MATERIAL(idx) GetMesh()->SetMaterial(idx, UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(idx), this))
 #define SET_MESH_COLOR(idx) 	auto mat = Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(idx));					\
-								if (mat) mat->SetVectorParameterValue(TEXT("Tint"), characterData.characterColor)		\
+								if (mat) mat->SetVectorParameterValue(TEXT("Tint"), characterData.playerColor)		\
 
 AIG_CharacterBase::AIG_CharacterBase(const FObjectInitializer& _Intializer)
 	: Super(_Intializer)
@@ -34,7 +34,7 @@ AIG_CharacterBase::AIG_CharacterBase(const FObjectInitializer& _Intializer)
 	if (WG_STATUS.Succeeded()) statusWidget->SetWidgetClass(WG_STATUS.Class);
 }
 
-void AIG_CharacterBase::SetCharacterData(const FCharacterData& _NewData)
+void AIG_CharacterBase::SetCharacterData(const FPlayerData& _NewData)
 {
 	PTT_LOG(Warning, TEXT("%s"), *_NewData.ToString());
 	characterData = _NewData;
@@ -69,11 +69,11 @@ void AIG_CharacterBase::BeginPlay()
 void AIG_CharacterBase::OnRep_UpdateCharacterData()
 {
 	//서버에서 캐릭터의 정보가 변경되면 클라이언트에서 업데이트한다
-	if (characterData.characterName.StartsWith(PLAYER_NAME_PREFIX, ESearchCase::CaseSensitive))
-		characterData.characterName = characterData.characterName.RightChop(PLAYER_NAME_PREFIX.Len());
+	if (characterData.playerName.StartsWith(PLAYER_NAME_PREFIX, ESearchCase::CaseSensitive))
+		characterData.playerName = characterData.playerName.RightChop(PLAYER_NAME_PREFIX.Len());
 
 	if (auto widget = Cast<UIGW_CharacterStatus>(statusWidget->GetWidget()))
-		widget->SetName(FText::FromString(characterData.characterName));
+		widget->SetName(FText::FromString(characterData.playerName));
 
 	int32 materialCount{ GetMesh()->GetMaterials().Num() };
 	for (int32 i = 0; i < materialCount; ++i)

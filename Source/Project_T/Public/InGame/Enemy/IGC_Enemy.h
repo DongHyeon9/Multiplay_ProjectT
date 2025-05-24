@@ -58,13 +58,20 @@ public:
 	void InitEnemy();
 	// 적의 활성화 상태를 결정함
 	// @param _bIsActive true면 적을 활성화 함
-	void SetActive(bool _bIsActive);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetActive(bool _bIsActive);
+	void Multicast_SetActive_Implementation(bool _bIsActive);
 	// overlap된 플레이어들에게 주기마다 데미지를 부여함
 	bool ApplyDamage(float _DeltaTime);
 	void Tick(float _DeltaTime);
 
+public:
+	UPawnMovementComponent* GetMovementComponent() const override;
+
 private:
-	void OnChangeState(E_CHARACTER_STATE _NewState);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnChangeState(E_CHARACTER_STATE _NewState);
+	void Multicast_OnChangeState_Implementation(E_CHARACTER_STATE _NewState);
 	void OnDelay_ChangeDisable();
 	void SetTarget();
 	void RemoveTarget();

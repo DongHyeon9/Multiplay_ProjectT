@@ -29,9 +29,9 @@ void AIG_GameMode::OnCompleteAllPlayer()
 		auto ps = pc->GetPlayerState<APlayerState>();
 		check(ps);
 		auto start = FindPlayerStart(pc, FString::Printf(TEXT("%s%d"), *START_PREFIX, i));
-		FCharacterData data{};
-		data.characterName = ps->GetPlayerName();
-		data.characterColor = playerColor.Num() > i ? playerColor[i] : defaultColor;
+		FPlayerData data{};
+		data.playerName = ps->GetPlayerName();
+		data.playerColor = playerColor.Num() > i ? playerColor[i] : defaultColor;
 		pc->InitPlayer(data);
 		pc->GetPawn()->SetActorTransform(start->GetActorTransform());
 	}
