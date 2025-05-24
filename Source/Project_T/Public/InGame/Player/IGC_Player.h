@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "../Project_T.h"
 #include "InGame/IG_CharacterBase.h"
 #include "IGC_Player.generated.h"
 

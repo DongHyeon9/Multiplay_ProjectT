@@ -1,23 +1,22 @@
 ﻿#include "InGame/IG_AnimInstance.h"
-#include "InGame/IG_CharacterBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 void UIG_AnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	character = Cast<AIG_CharacterBase>(GetOwningActor());
+	auto pawn = TryGetPawnOwner();
 
-	if (!character) return;
-
-	movementComp = character->GetCharacterMovement();
+	if (!pawn) return;
+	
+	movementComp = pawn->GetMovementComponent();
 }
 
 void UIG_AnimInstance::NativeUpdateAnimation(float _DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(_DeltaSeconds);
 
-	if (!character) return;
+	if (!movementComp) return;
 
 	velocity = movementComp->Velocity;
 	speed = velocity.Length();

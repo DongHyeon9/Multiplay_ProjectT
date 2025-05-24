@@ -1,5 +1,5 @@
 ﻿#include "InGame/IG_CharacterBase.h"
-#include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "InGame/IG_StatComponent.h"
 #include "Components/WidgetComponent.h"
@@ -17,12 +17,13 @@ AIG_CharacterBase::AIG_CharacterBase(const FObjectInitializer& _Intializer)
 
 	statComp = CreateDefaultSubobject<UIG_StatComponent>(TEXT("StatComp"));
 	statusWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("StatusWidget"));
+
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
+
 	statusWidget->SetupAttachment(RootComponent);
 	statusWidget->bHiddenInGame = true;
 	statusWidget->SetDrawSize(FVector2D{ 250.0f, 250.0f });
 	statusWidget->SetWidgetSpace(EWidgetSpace::Screen);
-
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_ENEMY(TEXT("/Game/02_Mesh/SKM_Manny"));
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ABP_ENEMY(TEXT("/Game/06_Animation/ABP_Manny"));

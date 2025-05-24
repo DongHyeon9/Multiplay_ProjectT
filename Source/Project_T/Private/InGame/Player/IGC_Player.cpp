@@ -13,8 +13,6 @@
 #include "InGame/Player/IG_PlayerController.h"
 #include "T_GameInstance.h"
 
-#include "Kismet/KismetSystemLibrary.h"
-
 AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	Super(_Intializer)
 {
@@ -33,10 +31,6 @@ AIGC_Player::AIGC_Player(const FObjectInitializer& _Intializer):
 	springArmComp->bInheritYaw = true;
 	springArmComp->bDoCollisionTest = false;
 	bUseControllerRotationYaw = false;
-
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->bUseControllerDesiredRotation = false;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.f, 0.0f);
 
 	camera->SetupAttachment(springArmComp);
 }

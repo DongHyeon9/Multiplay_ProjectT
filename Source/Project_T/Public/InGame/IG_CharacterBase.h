@@ -5,8 +5,6 @@
 #include "IG_CharacterBase.generated.h"
 
 class UInputComponent;
-class USkeletalMeshComponent;
-class USphereComponent;
 class UIG_StatComponent;
 class UWidgetComponent;
 

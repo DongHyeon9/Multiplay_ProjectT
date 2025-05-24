@@ -5,19 +5,24 @@
 #include "InGame/Player/IGC_Player.h"
 #include "Components/WidgetComponent.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "NavigationSystem.h"
-#include "AIController.h"
+#include "InGame/Enemy/IG_EnemyMovement.h"
+#include "GameFramework/FloatingPawnMovement.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include <limits>
 
 AIGC_Enemy::AIGC_Enemy(const FObjectInitializer& _Initializer)
 	: Super(_Initializer)
 {
+	GetCharacterMovement()->DestroyComponent();
+
+	enemyMovementComp = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("EnemyMovementComp"));
+
 	GetMesh()->bHiddenInGame = true;
 	GetStatusWidget()->SetVisibility(false);
 
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Enemy"));
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	AutoPossessAI = EAutoPossessAI::Spawned;
+	AutoPossessAI = EAutoPossessAI::Disabled;
 
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MI_ENEMY_01(TEXT("/Game/03_Material/Instances/Manny/MI_Enemy_01"));
 	static ConstructorHelpers::FObjectFinder<UMaterialInstance> MI_ENEMY_02(TEXT("/Game/03_Material/Instances/Manny/MI_Enemy_02"));
@@ -76,6 +81,25 @@ bool AIGC_Enemy::ApplyDamage(float _DeltaTime)
 	return true;
 }
 
+void AIGC_Enemy::Tick(float _DeltaTime)
+{
+	Super::Tick(_DeltaTime);
+
+	if (!targetPlayer) return;
+
+	FVector targetPos{ targetPlayer->GetActorLocation() };
+	FVector curPos{ GetActorLocation() };
+	FVector dir{ targetPos - curPos };
+	dir.Normalize();
+
+	AddMovementInput(dir);
+
+	if (prevDir.Equals(dir)) return;
+
+	prevDir = dir;
+	SetActorRotation(prevDir.Rotation());
+}
+
 void AIGC_Enemy::OnChangeState(E_CHARACTER_STATE _NewState)
 {
 	switch (_NewState)
@@ -88,12 +112,11 @@ void AIGC_Enemy::OnChangeState(E_CHARACTER_STATE _NewState)
 		// 적의 상태를 활성화 시킨다
 		GetStatusWidget()->SetVisibility(true);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		MoveToNearestPlayer();
+		SetTarget();
 		break;
 	}
 	case E_CHARACTER_STATE::DEAD: {
-		// 적이 죽었을 경우 추격을 멈추고 콜리전을 비활성화 한다
-		UAIBlueprintHelperLibrary::SimpleMoveToActor(GetController<AAIController>(), this);
+		RemoveTarget();
 		GetStatusWidget()->SetVisibility(false);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		// 일정 시간 후에 적을 비활성화 시킨다
@@ -113,16 +136,16 @@ void AIGC_Enemy::OnDelay_ChangeDisable()
 		disableHandle.Invalidate();
 }
 
-void AIGC_Enemy::MoveToNearestPlayer()
+void AIGC_Enemy::SetTarget()
 {
 	//현재 위치에서 제일 가까운 플레이어에게 간다
 	FVector currentLoc{ GetActorLocation() };
 	float nearestDistance{ std::numeric_limits<float>::max() };
-	APawn* nearestPawn{};
+	AIGC_Player* nearestPawn{};
 	UWorld* world{ GetWorld() };
 	for (auto pIter = world->GetPlayerControllerIterator(); pIter; ++pIter)
 	{
-		if (APawn* pawn = pIter->Get()->GetPawn())
+		if (AIGC_Player* pawn = pIter->Get()->GetPawn<AIGC_Player>())
 		{
 			float curDistance{ static_cast<float>((pawn->GetActorLocation() - currentLoc).SquaredLength()) };
 			if (curDistance >= nearestDistance)continue;
@@ -131,13 +154,13 @@ void AIGC_Enemy::MoveToNearestPlayer()
 			nearestPawn = pawn;
 		}
 	}
-	
-	if (!nearestPawn)
-		nearestPawn = world->GetFirstPlayerController()->GetPawn();
 
-	PTT_LOG(Warning, TEXT("%s -> %s"), *GetName(), *nearestPawn->GetName());
-	if (auto ai = GetController<AAIController>())
-		ai->MoveToActor(nearestPawn);
+	targetPlayer = nearestPawn ? nearestPawn : world->GetFirstPlayerController()->GetPawn<AIGC_Player>();
+}
+
+void AIGC_Enemy::RemoveTarget()
+{
+	targetPlayer = nullptr;
 }
 
 void AIGC_Enemy::OnBeginOverlap(UPrimitiveComponent* _OverlappedComponent, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, int32 _OtherBodyIndex, bool _bFromSweep, const FHitResult& _SweepResult)
@@ -162,7 +185,5 @@ void AIGC_Enemy::OnEndOverlap(UPrimitiveComponent* _OverlappedComponent, AActor*
 			FTSTicker::GetCoreTicker().RemoveTicker(damageHandle);
 			damageHandle.Reset();
 		}
-
-		MoveToNearestPlayer();
 	}
 }

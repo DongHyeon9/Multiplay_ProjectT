@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include "../Project_T.h"
 #include "InGame/IG_CharacterBase.h"
 #include "Containers/Ticker.h"
 #include "IGC_Enemy.generated.h"
 
 class AIGC_Player;
+class UFloatingPawnMovement;
 
 enum class E_CHARACTER_STATE : uint8;
 
@@ -18,6 +18,10 @@ class PROJECT_T_API AIGC_Enemy : public AIG_CharacterBase
 public:
 	// 상태가 변경될 때 호출되는 델리게이트
 	FOnEnemyStateDelegate onEnemyState{};
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, category = "AIGC_Enemy Default", meta = (AllowPrivateAccess = true))
+	UFloatingPawnMovement* enemyMovementComp{};
 
 private:
 	//몬스터가 죽었을때 비활성화되는 시간
@@ -36,8 +40,14 @@ private:
 	UPROPERTY()
 	TSet<AIGC_Player*> overlappedPlayer{};
 
+	//현재 추격하는 플레이어
+	UPROPERTY()
+	AIGC_Player* targetPlayer{};
+
 	// 데미지를 주는 타이머 핸들
 	FTSTicker::FDelegateHandle damageHandle{};
+
+	FVector prevDir{};
 
 public:
 	AIGC_Enemy(const FObjectInitializer& _Initializer);
@@ -51,11 +61,13 @@ public:
 	void SetActive(bool _bIsActive);
 	// overlap된 플레이어들에게 주기마다 데미지를 부여함
 	bool ApplyDamage(float _DeltaTime);
+	void Tick(float _DeltaTime);
 
 private:
 	void OnChangeState(E_CHARACTER_STATE _NewState);
 	void OnDelay_ChangeDisable();
-	void MoveToNearestPlayer();
+	void SetTarget();
+	void RemoveTarget();
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* _OverlappedComponent, AActor* _OtherActor, UPrimitiveComponent* _OtherComp, int32 _OtherBodyIndex, bool _bFromSweep, const FHitResult& _SweepResult);
