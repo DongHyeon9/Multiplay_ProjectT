@@ -6,11 +6,9 @@
 
 AIGSB_AOE::AIGSB_AOE()
 {
-	SetReplicates(true);
-	SetReplicateMovement(true);
-
 	skillMesh = CreateDefaultSubobject<UStaticMeshComponent >(TEXT("SkillMesh"));
 
+	SetRootComponent(skillMesh);
 	DisableSkill(skillMesh);
 
 	this->SetOwner(GetOwner());

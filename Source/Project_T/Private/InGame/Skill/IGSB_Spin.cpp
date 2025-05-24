@@ -4,9 +4,6 @@
 
 AIGSB_Spin::AIGSB_Spin()
 {
-	SetReplicates(true);
-	SetReplicateMovement(true);
-
 	centerMesh = CreateDefaultSubobject<USphereComponent >(TEXT("Center"));
 
 	spinMesh1 = CreateDefaultSubobject<UStaticMeshComponent >(TEXT("SpinMesh1"));

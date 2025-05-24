@@ -27,9 +27,30 @@ void UIG_StatComponent::SetCharacterStatus(F_CHARACTER_STATUS _NewStatus)
 	onChangeStatus.Broadcast(characterStatus);
 }
 
+void UIG_StatComponent::Server_AddExperience_Implementation(int32 _Exp)
+{
+	AddExperience(_Exp);
+}
+
 void UIG_StatComponent::AddExperience(int32 _Exp)
 {
-	if (!GetOwner()->HasAuthority()) return;
+	if (GetOwnerRole() < ROLE_Authority)
+	{
+		// 클라 -> 서버
+		Server_AddExperience(_Exp);
+		return;
+	}
+
+	if (characterStatus.currentEXP < 0)
+	{
+		characterStatus.currentEXP = 0;
+	}
+	if (characterStatus.nextLevelEXP < 0)
+	{
+		characterStatus.nextLevelEXP = 0;
+		return;
+	}
+
 	characterStatus.currentEXP += _Exp;
 
 	if (characterStatus.currentEXP >= characterStatus.nextLevelEXP)
@@ -43,6 +64,7 @@ void UIG_StatComponent::LevelUp()
 {
 	characterStatus.level++;
 
+	characterStatus.nextLevelEXP *= 1.5f;
 	characterStatus.damage += 5.f;
 	characterStatus.attackRange += 20.f;
 }

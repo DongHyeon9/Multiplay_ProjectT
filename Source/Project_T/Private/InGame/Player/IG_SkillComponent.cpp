@@ -9,6 +9,10 @@ void UIG_SkillComponent::RegistSkill(TSubclassOf<AIG_SkillBase> _SkillClass)
 	param.Owner = GetOwner();
 	auto newSkill = GetWorld()->SpawnActor<AIG_SkillBase>(_SkillClass, param);
 	newSkill->InitSkill();
+
+	newSkill->SetReplicates(true);
+	newSkill->SetReplicateMovement(true);
+
 	skillList.Emplace(newSkill);
 }
 

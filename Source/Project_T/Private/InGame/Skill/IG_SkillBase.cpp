@@ -4,7 +4,7 @@
 void AIG_SkillBase::BeginPlay()
 {
 	Super::BeginPlay();
-	SetReplicates(true);
+
 }
 
 void AIG_SkillBase::InitSkill()

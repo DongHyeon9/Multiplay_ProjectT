@@ -57,6 +57,11 @@ public:
 	// 캐릭터 스테이터스 변경
 	void SetCharacterStatus(F_CHARACTER_STATUS _NewStatus);
 
+	// 경험치 얻는 로직 (서버)
+	// @param _Exp는 경험치량이다
+	UFUNCTION(Server,Reliable,BlueprintCallable)
+	void Server_AddExperience(int32 _Exp);
+
 	// 경험치 얻는 로직 
 	// @param _Exp는 경험치량이다
 	UFUNCTION(BlueprintCallable)
