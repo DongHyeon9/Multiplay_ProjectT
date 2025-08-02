@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\Project_T.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{F31BBDD1-B3E8-3BCC-9652-680E16935819}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\Project_T.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\Project_TEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\Project_TServer.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <Filter Include="Source\Project_T">
+      <UniqueIdentifier>{D2B35874-BA01-30D9-942A-7CDB6D202682}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\Project_T\Project_T.Build.cs">
+      <Filter>Source\Project_T</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\Project_T\Project_T.cpp">
+      <Filter>Source\Project_T</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Project_T.h">
+      <Filter>Source\Project_T</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private">
+      <UniqueIdentifier>{EA1B3187-F4DD-3A7C-BA0B-2ADFBE343B37}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\T_GameInstance.cpp">
+      <Filter>Source\Project_T\Private</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame">
+      <UniqueIdentifier>{92C65911-1828-3D55-B79A-7ECE3480EC2A}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\IG_AnimInstance.cpp">
+      <Filter>Source\Project_T\Private\InGame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\IG_GameMode.cpp">
+      <Filter>Source\Project_T\Private\InGame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\IG_GameState.cpp">
+      <Filter>Source\Project_T\Private\InGame</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame\Component">
+      <UniqueIdentifier>{FB8EAF80-3549-39CE-9896-62818BF9E05D}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Component\IG_StatComponent.cpp">
+      <Filter>Source\Project_T\Private\InGame\Component</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame\Component\Enemy">
+      <UniqueIdentifier>{E135A719-0C73-3713-9C05-466150C81375}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Component\Enemy\IG_DamageComponent.cpp">
+      <Filter>Source\Project_T\Private\InGame\Component\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Component\Enemy\IG_EnemyStatComponent.cpp">
+      <Filter>Source\Project_T\Private\InGame\Component\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Component\Enemy\IG_TraceComponent.cpp">
+      <Filter>Source\Project_T\Private\InGame\Component\Enemy</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame\Component\Player">
+      <UniqueIdentifier>{FCC1B836-9E38-30C6-8B58-7E6E98DAB1B5}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Component\Player\IG_PlayerStatComponent.cpp">
+      <Filter>Source\Project_T\Private\InGame\Component\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Component\Player\IG_SkillComponent.cpp">
+      <Filter>Source\Project_T\Private\InGame\Component\Player</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame\Component\PlayerController">
+      <UniqueIdentifier>{BFB889B7-615E-3B7D-9720-7F72EBA26B90}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Component\PlayerController\IGM_Screen.cpp">
+      <Filter>Source\Project_T\Private\InGame\Component\PlayerController</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Component\PlayerController\IGM_Widget.cpp">
+      <Filter>Source\Project_T\Private\InGame\Component\PlayerController</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Component\PlayerController\IG_ManagerBase.cpp">
+      <Filter>Source\Project_T\Private\InGame\Component\PlayerController</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame\Enemy">
+      <UniqueIdentifier>{42AD6CED-334E-35EB-A7DA-6D4BFED25A06}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Enemy\IGC_Enemy.cpp">
+      <Filter>Source\Project_T\Private\InGame\Enemy</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame\Global">
+      <UniqueIdentifier>{A8566EE6-87F7-35AC-94A9-0C228351FE01}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Global\IG_Delegate.cpp">
+      <Filter>Source\Project_T\Private\InGame\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Global\IG_Enum.cpp">
+      <Filter>Source\Project_T\Private\InGame\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Global\IG_PreProcess.cpp">
+      <Filter>Source\Project_T\Private\InGame\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Global\IG_Struct.cpp">
+      <Filter>Source\Project_T\Private\InGame\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Global\IG_Value.cpp">
+      <Filter>Source\Project_T\Private\InGame\Global</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame\Interface">
+      <UniqueIdentifier>{B6BA8608-006D-3442-8571-4EC72A569C9D}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Interface\IG_Character.cpp">
+      <Filter>Source\Project_T\Private\InGame\Interface</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame\Player">
+      <UniqueIdentifier>{A3852CEB-2311-3AE7-83B9-63638E67FDC4}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Player\IGC_Player.cpp">
+      <Filter>Source\Project_T\Private\InGame\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Player\IG_PlayerController.cpp">
+      <Filter>Source\Project_T\Private\InGame\Player</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame\Skill">
+      <UniqueIdentifier>{5F177EED-80EC-3848-BE46-C64CDC308B53}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Skill\IGS_ActorSapwnBase.cpp">
+      <Filter>Source\Project_T\Private\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Skill\IGS_Area.cpp">
+      <Filter>Source\Project_T\Private\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Skill\IGS_Guardian.cpp">
+      <Filter>Source\Project_T\Private\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Skill\IGS_Projectile.cpp">
+      <Filter>Source\Project_T\Private\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Skill\IGS_Razer.cpp">
+      <Filter>Source\Project_T\Private\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Skill\IGS_Slash.cpp">
+      <Filter>Source\Project_T\Private\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Skill\IG_SkillBase.cpp">
+      <Filter>Source\Project_T\Private\InGame\Skill</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame\Skill\SkillActor">
+      <UniqueIdentifier>{E1DE8026-32D2-35C3-9CB4-4BD137B937DB}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Skill\SkillActor\IGSA_Area.cpp">
+      <Filter>Source\Project_T\Private\InGame\Skill\SkillActor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Skill\SkillActor\IGSA_Guardian.cpp">
+      <Filter>Source\Project_T\Private\InGame\Skill\SkillActor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Skill\SkillActor\IGSA_Projectile.cpp">
+      <Filter>Source\Project_T\Private\InGame\Skill\SkillActor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Skill\SkillActor\IG_SkillActorBase.cpp">
+      <Filter>Source\Project_T\Private\InGame\Skill\SkillActor</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\InGame\Widget">
+      <UniqueIdentifier>{A1C996D4-79C1-302D-9D9C-871F9C14811E}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Widget\IGW_CharacterStatus.cpp">
+      <Filter>Source\Project_T\Private\InGame\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Widget\IGW_Main.cpp">
+      <Filter>Source\Project_T\Private\InGame\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Widget\IGW_ResultCard.cpp">
+      <Filter>Source\Project_T\Private\InGame\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Widget\IGW_ResultPopup.cpp">
+      <Filter>Source\Project_T\Private\InGame\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Widget\IGW_SkillCard.cpp">
+      <Filter>Source\Project_T\Private\InGame\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\InGame\Widget\IGW_SkillSelect.cpp">
+      <Filter>Source\Project_T\Private\InGame\Widget</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\Intro">
+      <UniqueIdentifier>{E4FAA94D-B56E-3AB9-B0BC-851DA33D6B18}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\Intro\IL_GameMode.cpp">
+      <Filter>Source\Project_T\Private\Intro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\Intro\IL_PlayerController.cpp">
+      <Filter>Source\Project_T\Private\Intro</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\Intro\Widget">
+      <UniqueIdentifier>{C8E63005-CA5B-3E3F-873F-07E6CBE06D10}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\Intro\Widget\ILW_Main.cpp">
+      <Filter>Source\Project_T\Private\Intro\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\Intro\Widget\ILW_Modal.cpp">
+      <Filter>Source\Project_T\Private\Intro\Widget</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\Lobby">
+      <UniqueIdentifier>{0C395A9C-15ED-34E5-9749-5BC9D176D459}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\Lobby\L_GameMode.cpp">
+      <Filter>Source\Project_T\Private\Lobby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\Lobby\L_PlayerController.cpp">
+      <Filter>Source\Project_T\Private\Lobby</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Private\Lobby\Widget">
+      <UniqueIdentifier>{D1633EAC-A554-321D-89D6-7C8253A27850}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Private\Lobby\Widget\LW_ConnectState.cpp">
+      <Filter>Source\Project_T\Private\Lobby\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Private\Lobby\Widget\LW_MatchWait.cpp">
+      <Filter>Source\Project_T\Private\Lobby\Widget</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public">
+      <UniqueIdentifier>{CF5A8939-0A51-3BDE-9212-67A2695155C0}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\T_GameInstance.h">
+      <Filter>Source\Project_T\Public</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame">
+      <UniqueIdentifier>{FF651C6E-94A1-3F77-8C4A-366F942A83D5}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\IG_AnimInstance.h">
+      <Filter>Source\Project_T\Public\InGame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\IG_GameMode.h">
+      <Filter>Source\Project_T\Public\InGame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\IG_GameState.h">
+      <Filter>Source\Project_T\Public\InGame</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame\Component">
+      <UniqueIdentifier>{4126470F-C477-369B-A17C-05A48FBE6FC9}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Component\IG_StatComponent.h">
+      <Filter>Source\Project_T\Public\InGame\Component</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame\Component\Enemy">
+      <UniqueIdentifier>{A3A77832-9355-3CF4-AC7A-12C79656EAD4}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Component\Enemy\IG_DamageComponent.h">
+      <Filter>Source\Project_T\Public\InGame\Component\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Component\Enemy\IG_EnemyStatComponent.h">
+      <Filter>Source\Project_T\Public\InGame\Component\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Component\Enemy\IG_TraceComponent.h">
+      <Filter>Source\Project_T\Public\InGame\Component\Enemy</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame\Component\Player">
+      <UniqueIdentifier>{6E9F6409-71A9-394D-B4E6-D61DBEC9214B}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Component\Player\IG_PlayerStatComponent.h">
+      <Filter>Source\Project_T\Public\InGame\Component\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Component\Player\IG_SkillComponent.h">
+      <Filter>Source\Project_T\Public\InGame\Component\Player</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame\Component\PlayerController">
+      <UniqueIdentifier>{4FB4178A-9D46-3BAF-89AB-B953B85B3AFF}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Component\PlayerController\IGM_Screen.h">
+      <Filter>Source\Project_T\Public\InGame\Component\PlayerController</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Component\PlayerController\IGM_Widget.h">
+      <Filter>Source\Project_T\Public\InGame\Component\PlayerController</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Component\PlayerController\IG_ManagerBase.h">
+      <Filter>Source\Project_T\Public\InGame\Component\PlayerController</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame\Enemy">
+      <UniqueIdentifier>{B3475C20-062E-3ECB-81A9-A0E0BAEFEA75}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Enemy\IGC_Enemy.h">
+      <Filter>Source\Project_T\Public\InGame\Enemy</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame\Global">
+      <UniqueIdentifier>{C06EB522-7EE7-374D-9A17-84571E529D03}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Global\IG_Delegate.h">
+      <Filter>Source\Project_T\Public\InGame\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Global\IG_Enum.h">
+      <Filter>Source\Project_T\Public\InGame\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Global\IG_PreProcess.h">
+      <Filter>Source\Project_T\Public\InGame\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Global\IG_Struct.h">
+      <Filter>Source\Project_T\Public\InGame\Global</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Global\IG_Value.h">
+      <Filter>Source\Project_T\Public\InGame\Global</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame\Interface">
+      <UniqueIdentifier>{7D181CB1-3DA2-3A05-9073-B139B50DA294}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Interface\IG_Character.h">
+      <Filter>Source\Project_T\Public\InGame\Interface</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame\Player">
+      <UniqueIdentifier>{6112F63E-F790-3D2D-87F0-F86C6D40D962}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Player\IGC_Player.h">
+      <Filter>Source\Project_T\Public\InGame\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Player\IG_PlayerController.h">
+      <Filter>Source\Project_T\Public\InGame\Player</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame\Skill">
+      <UniqueIdentifier>{DE0C086E-B67D-3CDC-93B4-6D0C7BBF5E0F}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Skill\IGS_ActorSapwnBase.h">
+      <Filter>Source\Project_T\Public\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Skill\IGS_Area.h">
+      <Filter>Source\Project_T\Public\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Skill\IGS_Guardian.h">
+      <Filter>Source\Project_T\Public\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Skill\IGS_Projectile.h">
+      <Filter>Source\Project_T\Public\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Skill\IGS_Razer.h">
+      <Filter>Source\Project_T\Public\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Skill\IGS_Slash.h">
+      <Filter>Source\Project_T\Public\InGame\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Skill\IG_SkillBase.h">
+      <Filter>Source\Project_T\Public\InGame\Skill</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame\Skill\SkillActor">
+      <UniqueIdentifier>{8A135B6A-8DD9-32E1-A8B2-D704ED6025B6}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Skill\SkillActor\IGSA_Area.h">
+      <Filter>Source\Project_T\Public\InGame\Skill\SkillActor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Skill\SkillActor\IGSA_Guardian.h">
+      <Filter>Source\Project_T\Public\InGame\Skill\SkillActor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Skill\SkillActor\IGSA_Projectile.h">
+      <Filter>Source\Project_T\Public\InGame\Skill\SkillActor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Skill\SkillActor\IG_SkillActorBase.h">
+      <Filter>Source\Project_T\Public\InGame\Skill\SkillActor</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\InGame\Widget">
+      <UniqueIdentifier>{461ACBAF-23BE-314B-9B7A-AAF97747C6B8}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Widget\IGW_CharacterStatus.h">
+      <Filter>Source\Project_T\Public\InGame\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Widget\IGW_Main.h">
+      <Filter>Source\Project_T\Public\InGame\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Widget\IGW_ResultCard.h">
+      <Filter>Source\Project_T\Public\InGame\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Widget\IGW_ResultPopup.h">
+      <Filter>Source\Project_T\Public\InGame\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Widget\IGW_SkillCard.h">
+      <Filter>Source\Project_T\Public\InGame\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\InGame\Widget\IGW_SkillSelect.h">
+      <Filter>Source\Project_T\Public\InGame\Widget</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\Intro">
+      <UniqueIdentifier>{3B3F32B5-62B3-326A-9EA1-E7AE81FCF7C0}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\Intro\IL_GameMode.h">
+      <Filter>Source\Project_T\Public\Intro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\Intro\IL_PlayerController.h">
+      <Filter>Source\Project_T\Public\Intro</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\Intro\Widget">
+      <UniqueIdentifier>{F8C92E22-77E8-339E-B233-D03C156F1422}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\Intro\Widget\ILW_Main.h">
+      <Filter>Source\Project_T\Public\Intro\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\Intro\Widget\ILW_Modal.h">
+      <Filter>Source\Project_T\Public\Intro\Widget</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\Lobby">
+      <UniqueIdentifier>{FFE5199E-F9FE-35D2-8130-F0C3DB8A0074}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\Lobby\L_GameMode.h">
+      <Filter>Source\Project_T\Public\Lobby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\Lobby\L_PlayerController.h">
+      <Filter>Source\Project_T\Public\Lobby</Filter>
+    </ClCompile>
+    <Filter Include="Source\Project_T\Public\Lobby\Widget">
+      <UniqueIdentifier>{00476B9E-E0EB-3D93-A0E6-6DD2E56D9BF9}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Project_T\Public\Lobby\Widget\LW_ConnectState.h">
+      <Filter>Source\Project_T\Public\Lobby\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Project_T\Public\Lobby\Widget\LW_MatchWait.h">
+      <Filter>Source\Project_T\Public\Lobby\Widget</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

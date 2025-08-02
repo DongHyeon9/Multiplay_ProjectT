@@ -1,0 +1,19 @@
+{
+	"Targets": [
+		{
+			"Name": "Project_T",
+			"Path": "..\\Source\\Project_T.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "Project_TEditor",
+			"Path": "..\\Source\\Project_TEditor.Target.cs",
+			"Type": "Editor"
+		},
+		{
+			"Name": "Project_TServer",
+			"Path": "..\\Source\\Project_TServer.Target.cs",
+			"Type": "Server"
+		}
+	]
+}

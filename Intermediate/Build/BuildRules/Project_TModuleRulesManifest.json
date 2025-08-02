@@ -1,0 +1,9 @@
+{
+	"SourceFiles": [
+		"D:\\Unreal\\UE5_5_Src\\Multiplay_ProjectT\\Source\\Project_T\\Project_T.Build.cs",
+		"D:\\Unreal\\UE5_5_Src\\Multiplay_ProjectT\\Source\\Project_T.Target.cs",
+		"D:\\Unreal\\UE5_5_Src\\Multiplay_ProjectT\\Source\\Project_TEditor.Target.cs",
+		"D:\\Unreal\\UE5_5_Src\\Multiplay_ProjectT\\Source\\Project_TServer.Target.cs"
+	],
+	"EngineVersion": "5.5.4"
+}
